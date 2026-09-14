@@ -8,6 +8,7 @@ Criar commits seguindo Conventional Commits, mensagem em **inglês**, com valida
 
 ## Regras
 
+- **OBRIGATÓRIO:** mensagem **curta**, uma linha só. Corpo é exceção rara e tem no máximo 4 linhas.
 - **OBRIGATÓRIO:** mensagem em **inglês**, no imperativo presente: `add`, `fix`, `remove`, `update`, `extract`. Nunca passado (`added`) nem terceira pessoa (`adds`).
 - **OBRIGATÓRIO:** mensagem **toda em minúsculo**, exceto:
   - Siglas com capitalização própria: `API`, `JWT`, `HTTP`, `HTTPS`, `SQL`, `UUID`, `URL`, `CSS`, `HTML`, `CRUD`, `CORS`, `JSON`, `OAuth`.
@@ -98,8 +99,9 @@ Formato:
 type: short description in english
 ```
 
-- **Padrão: linha única, sem corpo.** A primeira linha deve bastar.
-- Corpo só quando a mudança precisa de contexto que a primeira linha não dá (o "por quê" de uma decisão). Nesse caso: separado por linha em branco, no máximo 3 linhas, direto.
+- **Padrão: linha única, sem corpo.** Mensagem curta, a primeira linha deve bastar na grande maioria dos commits.
+- Corpo é exceção: só quando a mudança precisa de contexto que a primeira linha não dá (o "por quê" de uma decisão não óbvia, efeito colateral, breaking change). Nesse caso: separado por linha em branco, no máximo 4 linhas, direto.
+- Corpo que apenas repete a descrição em outras palavras, narra o passo a passo ou lista os arquivos alterados é proibido: o diff já mostra isso.
 
 Regras da mensagem:
 - **Idioma: inglês.** Verbo no imperativo presente (`add`, `fix`, `remove`, `update`, `extract`, `rename`).
@@ -108,7 +110,7 @@ Regras da mensagem:
 - Primeira linha: máximo 72 caracteres.
 - Sem escopo entre parênteses. A descrição já diz o que mudou, e o diff mostra onde.
 - Descrição: começa com verbo em minúsculo, sem ponto final.
-- Corpo (só quando existir): explica o "por quê" (não o "o quê"), máximo 3 linhas.
+- Corpo (só quando existir): explica o "por quê" (não o "o quê"), máximo 4 linhas.
 - Sem travessão (`—`). Use hífen com espaços, vírgula ou dois-pontos.
 
 ### 5. Confirmar branch e commit com o usuário
