@@ -73,29 +73,29 @@ Analisar o diff e classificar no tipo correto:
 
 | Tipo | Quando usar | Exemplo |
 |------|-------------|---------|
-| `feat` | Nova funcionalidade | ``feat(user): add login validation to `LoginForm` `` |
-| `fix` | Correção de bug | ``fix(cart): correct total price in `calculateTotal` `` |
-| `docs` | Documentação | ``docs(readme): update install instructions`` |
-| `refactor` | Refatoração sem mudar comportamento | ``refactor(product): extract logic to `productService` `` |
-| `chore` | Manutenção/config | ``chore(deps): update project dependencies`` |
-| `style` | Formatação, espaçamento (sem lógica) | ``style(button): adjust `<Button/>` spacing`` |
-| `test` | Adição ou correção de testes | ``test(user): add `userService` tests`` |
-| `perf` | Melhoria de performance | ``perf(list): memoize rendering with `useMemo` `` |
-| `ci` | Mudanças em pipelines/CI | ``ci(github): add build workflow to GitHub Actions`` |
-| `build` | Mudanças no sistema de build | ``build(next): update `next.config.ts` `` |
-| `revert` | Reverter commit anterior | ``revert(user): revert login validation`` |
+| `feat` | Nova funcionalidade | ``feat: add login validation to `LoginForm` `` |
+| `fix` | Correção de bug | ``fix: correct total price in `calculateTotal` `` |
+| `docs` | Documentação | ``docs: update install instructions`` |
+| `refactor` | Refatoração sem mudar comportamento | ``refactor: extract logic to `productService` `` |
+| `chore` | Manutenção/config | ``chore: update project dependencies`` |
+| `style` | Formatação, espaçamento (sem lógica) | ``style: adjust `<Button/>` spacing`` |
+| `test` | Adição ou correção de testes | ``test: add `userService` tests`` |
+| `perf` | Melhoria de performance | ``perf: memoize list rendering with `useMemo` `` |
+| `ci` | Mudanças em pipelines/CI | ``ci: add build workflow to GitHub Actions`` |
+| `build` | Mudanças no sistema de build | ``build: update `next.config.ts` `` |
+| `revert` | Reverter commit anterior | ``revert: revert login validation`` |
 
 Mais exemplos:
-- ``feat(api): add `GET /users` with pagination``
-- ``feat(auth): add session check to protected routes``
-- ``fix(products): filter out soft-deleted rows in list query``
-- ``chore(deps): update Prisma to the latest version``
+- ``feat: add `GET /users` with pagination``
+- ``feat: add session check to protected routes``
+- ``fix: filter out soft-deleted rows in product list query``
+- ``chore: update Prisma to the latest version``
 
 ### 4. Montar mensagem
 
 Formato:
 ```
-type(scope): short description in english
+type: short description in english
 ```
 
 - **Padrão: linha única, sem corpo.** A primeira linha deve bastar.
@@ -106,7 +106,7 @@ Regras da mensagem:
 - **Tudo em minúsculo**, exceto siglas (`API`, `JWT`, `URL`...) e nomes próprios de tecnologia (`React`, `Next.js`, `PostgreSQL`, `Prisma`...).
 - **Crases (`` ` ``) em destaques:** nomes de arquivos, tipos, funções, componentes, hooks, props, comandos, endpoints. Ex: `` `Button.tsx` ``, `` `userService` ``, `` `useAuth` ``, `` `isLoading` ``, `` `GET /users` ``.
 - Primeira linha: máximo 72 caracteres.
-- Escopo: módulo ou feature afetada, em inglês minúsculo e `kebab-case` (`user`, `auth`, `cart`, `key-result`).
+- Sem escopo entre parênteses. A descrição já diz o que mudou, e o diff mostra onde.
 - Descrição: começa com verbo em minúsculo, sem ponto final.
 - Corpo (só quando existir): explica o "por quê" (não o "o quê"), máximo 3 linhas.
 - Sem travessão (`—`). Use hífen com espaços, vírgula ou dois-pontos.
@@ -122,7 +122,7 @@ Arquivos a commitar:
   A  src/hooks/useAuth.ts
 
 Mensagem:
-  feat(auth): add `useAuth` hook for session handling
+  feat: add `useAuth` hook for session handling
 
 Commitar nessa branch? (s/n ou informe outra branch)
 ```
@@ -136,14 +136,14 @@ Commitar nessa branch? (s/n ou informe outra branch)
 2. Criar commit com HEREDOC (para formatação correta)
 3. Rodar `git status` para confirmar sucesso
 
-## Mudanças em múltiplos escopos
+## Mudanças em múltiplas áreas
 
-Se o diff contiver mudanças em módulos diferentes e não-relacionadas, sugerir commits separados:
+Se o diff contiver mudanças em áreas diferentes e não-relacionadas, sugerir commits separados:
 
 ```
-Detectei mudanças em 2 escopos distintos:
-1. feat(auth): add authentication middleware
-2. fix(dashboard): correct goals chart
+Detectei mudanças em 2 áreas distintas:
+1. feat: add authentication middleware
+2. fix: correct goals chart
 
 Recomendo 2 commits separados. Prosseguir assim?
 ```

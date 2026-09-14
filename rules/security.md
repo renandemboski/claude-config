@@ -102,7 +102,7 @@ const securityHeaders = [
 
 - `npm audit` periódico e antes de cada deploy. `npm ci` no build, com `package-lock.json` commitado.
 - Evitar pacote abandonado: sem release recente, poucos downloads, autor desconhecido.
-- Atualizar dependências em commits `chore(deps): ...` dedicados.
+- Atualizar dependências em commits `chore: ...` dedicados.
 
 ### A07 - Identification and Authentication Failures
 

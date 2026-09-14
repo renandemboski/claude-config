@@ -29,13 +29,12 @@ O padrão completo de mensagem (idioma, minúsculas, siglas, crases, tipos e exe
 
 Essencial:
 
-- Formato: `<type>(<scope>): <description>`, em inglês.
-- Escopo em inglês minúsculo e `kebab-case` (ex: `user`, `auth`, `key-result`).
+- Formato: `<type>: <description>`, em inglês. Sem escopo entre parênteses.
 - Descrição com verbo no imperativo presente em minúsculo (`add`, `fix`, `remove`), sem ponto final. Primeira linha com máximo 72 caracteres.
 - Tipos: `feat`, `fix`, `docs`, `refactor`, `chore`, `style`, `test`, `perf`, `ci`, `build`, `revert`.
 - Mensagem de linha única por padrão. Corpo só quando agrega contexto real, curto (máximo 3 linhas).
 - **Nunca** incluir `Co-Authored-By`. **Nunca** usar travessão (`—`): hífen com espaços, vírgula ou dois-pontos.
-- Exemplo: ``feat(user): add user registration to `UserForm` ``
+- Exemplo: ``feat: add user registration to `UserForm` ``
 
 ## Pull Requests
 
