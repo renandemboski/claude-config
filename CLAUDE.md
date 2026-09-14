@@ -139,6 +139,7 @@ Em dúvida entre os dois primeiros, perguntar ao usuário. As aprovações do fl
 | Segurança | `~/.claude/rules/security.md` | OWASP Top 10, XSS, CSRF, secrets, headers |
 | Git | `~/.claude/rules/git.md` | Branches, commits, PRs, workflow |
 | Docker | `~/.claude/rules/docker.md` | docker-compose, Dockerfile, imagens, volumes |
+| Deploy | `~/.claude/rules/deploy.md` | Só quando o assunto for subir para produção ou o app estiver crescendo. Projeto pequeno ou local não precisa |
 
 **NUNCA pule essa etapa. Leia o arquivo ANTES de começar a implementação.**
 

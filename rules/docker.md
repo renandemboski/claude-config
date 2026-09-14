@@ -1,5 +1,7 @@
 # Regras de Docker
 
+> Subir para produção, escala, cache e observabilidade: `rules/deploy.md`.
+
 ## Contexto
 
 Docker cobre dois casos no projeto:
