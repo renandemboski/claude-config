@@ -1,0 +1,16 @@
+# Lista branca: só a configuração entra no repo. Todo o resto fica fora
+# (credenciais, transcrições, memórias, planos, caches).
+*
+!.gitignore
+!.gitattributes
+!README.md
+!CLAUDE.md
+!settings.json
+!rules/
+!rules/**
+!commands/
+!commands/**
+!agents/
+!agents/**
+!hooks/
+!hooks/**

@@ -1,0 +1,2 @@
+# Sessoes que o script nunca apaga, mesmo arquivadas.
+# Um id (completo ou os 8 primeiros caracteres) por linha.
