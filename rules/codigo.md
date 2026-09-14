@@ -7,6 +7,8 @@
 - Nunca `any` em TypeScript. Tipar tudo explicitamente.
 - Nunca hardcodar cores, URLs, secrets ou credenciais: usar tokens e variáveis de ambiente.
 - Nunca instalar dependência sem verificar se o projeto já resolve com o que tem.
+- Nunca usar biblioteca paga, com plano gratuito limitado, trial ou licença restritiva (comercial, GPL, AGPL, SSPL, "source available") sem permissão explícita do usuário. Antes de propor, checar a licença e o custo. Preferir open source com licença permissiva: MIT, Apache 2.0, ISC, BSD.
+- Serviço externo pago ou com cota (API, SaaS, chave de terceiro) segue a mesma regra: propor primeiro, usar só depois do aval.
 - Em dúvida sobre API de biblioteca (assinatura, versão, funcionalidade nova), consultar o Context7 (MCP) em vez de confiar na memória.
 - Após qualquer alteração, limpar: imports não usados, variáveis mortas, arquivos órfãos.
 - Toda página com dados assíncronos trata os 3 estados: loading, empty e erro.
