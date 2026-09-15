@@ -78,6 +78,7 @@ Legenda: `[x]` concluído, `[>]` em andamento (com o agente), `[ ]` aguardando (
 - Lançar `docs-writer` para atualizar `README.md`, `docs/regras-de-negocio.md` e `.env.example` conforme o que mudou.
 - Marcar tarefas como concluídas.
 - Reportar ao usuário: o que foi feito, arquivos, validações executadas e pendências.
+- Se o usuário quiser polir o resultado até uma referência concreta (tela de referência, métrica, gabarito), oferecer o `/gauntlet`. Não rodar por conta própria: custa horas.
 - Oferecer o commit via fluxo do `/commit` (nunca commitar sem ele; os guards de hook valem para todos os agentes).
 
 ## Regras do fluxo
