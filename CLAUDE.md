@@ -163,6 +163,48 @@ Em dúvida entre os dois primeiros, perguntar ao usuário. As aprovações do fl
 
 ## Documentação
 
-- `README.md` na raiz: stack, setup, como rodar, variáveis de ambiente.
-- `docs/regras-de-negocio.md`: regras de negócio centralizadas (atualizar a cada feature).
-- `.env.example` sempre atualizado com chaves e valores fictícios.
+Documentação é o mínimo para alguém rodar e mexer no projeto. Texto que ninguém usa para agir não entra.
+
+### `README.md`: porta de entrada
+
+Stack, como rodar e o básico. O que não cabe aqui vai para `docs/`.
+
+- Nome do projeto e uma frase dizendo o que ele faz.
+- Stack e requisitos (runtime e versão).
+- Como rodar em desenvolvimento: os comandos em bloco de código, na ordem.
+- Variáveis de ambiente: apontar para o `.env.example`.
+- Scripts principais (`dev`, `build`, `test`), uma linha cada.
+
+Só isso. Sem badge, roadmap, changelog, screenshot decorativo, arquitetura ou regra de negócio.
+
+Nada que vai para o repo cita arquivo que fica fora dele: o README nunca menciona `CLAUDE.md`, `.claude/`, `AGENTS.md`, regra global nem caminho da máquina. Quem clona o repo só enxerga o que está nele.
+
+### Arquivos de IA ficam fora do repo
+
+`CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.claude/`, `.cursorrules` e afins são locais. Entram no `.gitignore` do projeto na criação. Só sobem se o time inteiro decidir compartilhar.
+
+O `CLAUDE.md` do projeto, quando existir, tem só regras simples que valem sempre naquele projeto e que a regra global não cobre: comando fora do padrão, serviço que precisa subir antes, armadilha que já quebrou. Curto, sem repetir regra global.
+
+### Pasta `docs/`: vai para o repo, com limites
+
+Só existe quando tem conteúdo de verdade. Nada de pasta vazia, arquivo de uma linha ou texto gerado para preencher.
+
+Pode ter:
+
+- `regras-de-negocio.md`: regras do domínio, seção por área, regras numeradas, linguagem de negócio.
+- `decisoes.md` (ou `adr/`): decisões de arquitetura com contexto, escolha e motivo, uma por seção.
+- `deploy.md`: como o app sobe e onde, passo a passo, quando houver deploy.
+- Diagrama ou fluxo, quando o texto sozinho não explica.
+
+Nunca pode ter:
+
+- Dado sensível: senha, token, chave, connection string, IP, nome de servidor, e-mail de cliente, dado pessoal, exportação de banco.
+- Arquivo de IA (`CLAUDE.md`, `AGENTS.md`, prompt, transcrição de conversa).
+- Cópia de código, log, print de tela com dado real, planilha, PDF ou binário.
+- Documentação que já existe em outro lugar (copiar doc de biblioteca, colar README de terceiro).
+
+Prosa em português; identificadores, comandos e caminhos como estão no código.
+
+### `.env.example`
+
+Toda chave, valor fictício, comentário só na chave que não é óbvia. Vai para o repo: é código, não documentação.

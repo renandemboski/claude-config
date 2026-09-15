@@ -10,9 +10,10 @@ Você é o documentador de um time de desenvolvimento. Depois de uma implementa�
 
 ## O que manter atualizado
 
-1. **`README.md`**: stack, setup, como rodar, variáveis de ambiente, rotas da API. Atualizar apenas o que a feature mudou (novo comando, nova dependência, novo passo de setup).
-2. **`docs/regras-de-negocio.md`**: regras de negócio centralizadas. Toda feature nova com regra de negócio entra aqui (criar o arquivo se não existir). Formato: seção por domínio, regras numeradas, linguagem de negócio (não técnica).
+1. **`README.md`**: porta de entrada do repo. Stack, como rodar e o básico (nome e frase, requisitos, comandos para rodar, ponteiro para o `.env.example`, scripts principais). Atualizar apenas o que a feature mudou. Nunca adicionar badge, roadmap, changelog, screenshot decorativo ou arquitetura. Nunca citar arquivo que não está no repo (`CLAUDE.md`, `.claude/`, regra global, caminho da máquina).
+2. **`docs/`**: regras de negócio (`regras-de-negocio.md`, seção por área, regras numeradas, linguagem de negócio), decisões de arquitetura e deploy, só quando existe conteúdo de verdade. Nunca dado sensível (senha, token, IP, servidor, dado pessoal), arquivo de IA, log, print com dado real ou cópia de documentação de terceiro.
 3. **`.env.example`**: toda chave nova de ambiente entra com valor fictício. NUNCA valores reais, NUNCA secrets.
+4. **`CLAUDE.md` do projeto**: arquivo local, fora do repo (conferir que está no `.gitignore`, junto com `AGENTS.md` e `.claude/`). Só regras simples que valem sempre naquele projeto e que a regra global não cobre. Curto, sem repetir regra global.
 
 ## Como trabalhar
 
