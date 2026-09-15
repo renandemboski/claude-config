@@ -16,6 +16,23 @@
 - Comentários só onde precisa e curtos: uma linha explicando um "porquê" não óbvio. Proibido bloco de comentário com várias linhas, comentário narrando o que a linha seguinte faz e comentário óbvio.
 - Travessão (`—`) e emojis são proibidos em código, comentários e qualquer arquivo gerado. No lugar do travessão: hífen com espaços, vírgula ou dois-pontos.
 
+## Formatação e lint (obrigatório em todo projeto)
+
+Todo projeto nasce com formatador e linter configurados, antes da primeira feature. Sem isso, cada code review vira discussão de estilo e o diff enche de mudança de espaço.
+
+- **Prettier** decide a formatação. `.prettierrc` na raiz com poucas opções (`semi`, `singleQuote`, `printWidth`, `trailingComma`) e `.prettierignore`. Formatação nunca é discutida em review nem feita à mão.
+- **ESLint** em flat config (`eslint.config.mjs`) com `typescript-eslint` no preset `strict` e `eslint-config-prettier` por último, para não brigar com o Prettier. Em Next.js, incluir `eslint-config-next`.
+- **`.editorconfig`** na raiz: `indent_style = space`, `indent_size = 2`, `end_of_line = lf`, `charset = utf-8`, `trim_trailing_whitespace = true`, `insert_final_newline = true`.
+- **Scripts com nome fixo** no `package.json`: `lint`, `lint:fix`, `format`, `format:check`, `typecheck` (`tsc --noEmit`). CI, QA e agentes chamam esses nomes, nunca comando avulso.
+- **Pre-commit local**: `lint-staged` rodando Prettier e ESLint só nos arquivos staged, acionado por `simple-git-hooks` (mais leve que husky). Commit com erro de lint não passa; `--no-verify` continua proibido.
+- **Warning é erro**: `eslint --max-warnings 0`. Regra desligada só com comentário de uma linha dizendo o porquê.
+- Setup de projeto novo em um comando:
+
+```bash
+npm i -D prettier eslint typescript-eslint eslint-config-prettier lint-staged simple-git-hooks
+```
+
+
 ## Nomenclatura
 
 Todo identificador de código é em inglês: variáveis, funções, tipos, componentes, hooks, arquivos, pastas, modelos de banco, tabelas e colunas. Texto visível ao usuário final continua em português: labels, mensagens de erro e de validação, placeholders, conteúdo de tela. Comentário de código, quando existir, também em inglês.

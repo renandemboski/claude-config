@@ -76,6 +76,8 @@ Vale para respostas, commits, PRs e documentação:
 
 Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica (cor decidida vira token, componente usa token), nunca a escolha estética.
 
+- Antes da primeira feature de qualquer projeto novo: formatador, lint, `.editorconfig` e pre-commit configurados conforme `rules/codigo.md`.
+
 ## Stack Padrão
 
 | Camada | Tecnologias |
