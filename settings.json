@@ -21,36 +21,6 @@
     ]
   },
   "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/auto-cleanup.sh",
-            "timeout": 60,
-            "async": true
-          },
-          {
-            "type": "command",
-            "command": "python ~/.claude/hooks/apagar-sessoes-arquivadas.py --hook",
-            "timeout": 30,
-            "async": true
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python ~/.claude/hooks/apagar-sessoes-arquivadas.py --hook",
-            "timeout": 30,
-            "async": true
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
