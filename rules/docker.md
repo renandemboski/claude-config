@@ -26,22 +26,43 @@ Docker cobre dois casos no projeto:
 └── src/
 ```
 
+## Nomes
+
+Tudo que aparece em `docker ps`, `docker volume ls` e no banco recebe o nome do projeto na frente, em minúsculo, sem sufixo aleatório, sem abreviação (`db`, `pg`) e sem `_1` gerado pelo Compose.
+
+| O quê | Padrão | Exemplo para o projeto `finance` |
+|-------|--------|----------------------------------|
+| Projeto do Compose (`name:`) | `<project>` | `finance` |
+| Serviço e container do banco | `<project>-database` | `finance-database` |
+| Volume de dados | `<project>-database-data` | `finance-database-data` |
+| Outros containers | `<project>-<papel>` | `finance-api`, `finance-web`, `finance-cache` |
+| Rede (quando declarada) | `<project>-network` | `finance-network` |
+| Nome do banco | `<project>` em `snake_case` | `finance` |
+| Usuário do banco | `<project>_app` | `finance_app` |
+
+- Container e volume usam hífen; banco e usuário usam underscore (Postgres exige aspas em identificador com hífen).
+- `container_name` explícito em todo serviço: sem ele o Compose gera `<pasta>-<serviço>-1`.
+- Nunca o usuário `postgres` (superusuário) na aplicação. Ver `rules/security.md`.
+
 ## docker-compose.yml
 
 ```yaml
+name: finance
+
 services:
-  db:
+  database:
     image: postgres:17.5-alpine
+    container_name: finance-database
     restart: unless-stopped
     env_file: .env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_USER: ${POSTGRES_USER}          # finance_app
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: ${POSTGRES_DB}              # finance
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - finance-database-data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -51,14 +72,16 @@ services:
       start_period: 10s
 
 volumes:
-  pgdata:
+  finance-database-data:
 ```
+
+Trocar `finance` pelo nome do projeto nos quatro lugares: `name`, `container_name`, volume e comentários das variáveis.
 
 ### Regras
 
 - Versão fixada na imagem (`postgres:17.5-alpine`), nunca `latest`.
 - Credenciais via `env_file` ou variável de ambiente, nunca no arquivo.
-- Volume nomeado para os dados: `pgdata`. Bind mount de dados do Postgres dá problema de permissão.
+- Volume nomeado para os dados: `<project>-database-data`. Bind mount de dados do Postgres dá problema de permissão.
 - `init.sql` montado como somente leitura, roda apenas na primeira criação do volume: serve para extensão (`create extension if not exists "pgcrypto"`), não para tabela. Estrutura é `prisma migrate`, sempre.
 - Healthcheck com `pg_isready`: serviço que depende do banco usa `depends_on` com `condition: service_healthy`.
 - Expor porta só do que precisa ser acessado da máquina.
