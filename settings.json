@@ -55,6 +55,16 @@
             "statusMessage": "Validando mensagem de commit"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/pre-write-guard.sh",
+            "timeout": 15
+          }
+        ]
       }
     ]
   },

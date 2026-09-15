@@ -24,7 +24,7 @@ No Windows, a pasta é `C:\Users\<usuario>\.claude`.
 | `rules/` | Regras por área, lidas sob demanda antes de codar |
 | `agents/` | Time de 8 agentes: refinamento, plano, contrato de API, implementação, QA, segurança, docs |
 | `commands/` | `/commit`, `/dev-team` e `/gauntlet` (loop de qualidade com crítico cego) |
-| `hooks/` | Guardas de git (commit, push, segredos) e formatação |
+| `hooks/` | Guardas de git (commit, push, segredos), de escrita (travessão e emoji) e formatação |
 
 ## Hooks
 
