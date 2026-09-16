@@ -1,6 +1,6 @@
 # claude-config
 
-Configuração pessoal do Claude Code: regras, agente, comandos e hooks.
+Configuração pessoal do Claude Code: regras, comandos e hooks.
 
 Stack alvo: TypeScript, Next.js (App Router), PostgreSQL com Prisma, Auth.js, Tailwind, Vitest, npm.
 
@@ -11,7 +11,7 @@ Clonar e copiar o conteúdo para a pasta de configuração do Claude Code:
 ```bash
 git clone https://github.com/renandemboski/claude-config.git
 cd claude-config
-cp -r CLAUDE.md settings.json rules agents commands hooks ~/.claude/
+cp -r CLAUDE.md settings.json rules commands hooks ~/.claude/
 ```
 
 No Windows, a pasta é `C:\Users\<usuario>\.claude`.
@@ -22,8 +22,7 @@ No Windows, a pasta é `C:\Users\<usuario>\.claude`.
 |-------|----------|
 | `CLAUDE.md` | Regras gerais: escrita, estilo de resposta, stack, fluxo de trabalho |
 | `rules/` | Regras por área, lidas sob demanda antes de codar |
-| `agents/` | `critic`, o crítico cego usado pelo `/gauntlet` |
-| `commands/` | `/commit` e `/gauntlet` (loop de qualidade com crítico cego) |
+| `commands/` | `/commit` |
 | `hooks/` | Guardas de git (commit, push, segredos), de escrita (travessão e emoji) e formatação |
 
 ## Hooks

@@ -10,7 +10,5 @@
 !rules/**
 !commands/
 !commands/**
-!agents/
-!agents/**
 !hooks/
 !hooks/**
