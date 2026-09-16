@@ -82,7 +82,7 @@ Vale para respostas, commits, PRs e documentação:
 **OBRIGATÓRIO:** Ao iniciar qualquer projeto novo, ANTES de criar qualquer arquivo ou estrutura, perguntar ao usuário:
 
 1. **Identidade visual**: já existe referência (Figma, screenshot, site) ou definimos cores e tipografia do zero agora?
-2. **Escopo**: o projeto precisa de banco e autenticação, ou é só interface por enquanto?
+2. **Escopo**: o projeto precisa de banco e autenticação, ou é só uma landing page (interface sem dados) por enquanto?
 
 Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica (cor decidida vira token, componente usa token), nunca a escolha estética.
 
@@ -122,7 +122,7 @@ Um repositório por projeto, fullstack no Next.js.
 ```
 
 - Nunca commitar `.env`, apenas `.env.example`.
-- `README.md` com stack, setup, como rodar e variáveis de ambiente.
+- `README.md` com stack, setup e como rodar. Variáveis de ambiente ficam só no `.env.example`, o README só aponta para ele.
 
 ## Regras que NUNCA devem ser ignoradas
 
