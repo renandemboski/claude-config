@@ -29,7 +29,7 @@ src/
 │   ├── api-error.ts                # helper central de erro
 │   └── env.ts                      # variáveis de ambiente validadas
 ├── generated/prisma/               # Prisma Client gerado
-└── middleware.ts
+└── proxy.ts                        # Auth.js na borda (antigo middleware.ts)
 ```
 
 ### Regras de organização
@@ -213,15 +213,15 @@ if (!session?.user) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401)
 ```
 
 ```ts
-// src/middleware.ts
-export { auth as middleware } from "@/lib/auth";
+// src/proxy.ts (antigo middleware.ts, renomeado no Next 16)
+export { auth as proxy } from "@/lib/auth";
 
 export const config = {
   matcher: ["/((?!api/auth|login|_next/static|_next/image|favicon.ico).*)"],
 };
 ```
 
-- Middleware corta o tráfego óbvio, mas não é a proteção: todo Route Handler e toda Server Action verificam a sessão de novo.
+- O proxy corta o tráfego óbvio, mas não é a proteção: todo Route Handler e toda Server Action verificam a sessão de novo. Projeto vindo do Next 15 migra com `npx @next/codemod@canary middleware-to-proxy .`.
 - Permissão por recurso é checada no service, comparando com o dono do registro. Ter sessão válida não dá acesso ao dado de outro usuário.
 - `AUTH_SECRET` obrigatório e só em variável de ambiente.
 - Senha nunca em log, nunca em resposta, nunca em `console.log`. Hash com `argon2` ou `bcrypt`.

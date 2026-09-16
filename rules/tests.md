@@ -36,7 +36,7 @@ Teste existe para pegar bug real, não para fazer volume. Antes de escrever, per
 
 - Vitest como framework, para código de cliente e de servidor.
 - Testing Library para testar pelo comportamento, não pela implementação: buscar por role, label e texto, nunca por classe CSS ou estrutura interna.
-- Arquivo junto do código testado: `Button.test.tsx`, `useProducts.test.ts`, `productService.test.ts`.
+- Arquivo junto do código testado, em kebab-case como o resto: `button.test.tsx`, `use-products.test.ts`, `products.test.ts`.
 - Componentes com DOM rodam no ambiente `jsdom`. Código de servidor roda em `node`.
 
 ### O que testar no cliente

@@ -17,7 +17,7 @@ Stack: TypeScript, Next.js App Router (sempre a versão mais recente), PostgreSQ
 **Ataque:** usuário lê ou altera recurso de outro usuário (IDOR), escala privilégio, chama ação sem permissão. **Mitigação:**
 
 - Verificar a sessão do Auth.js em **todo** Route Handler e **toda** Server Action. Server Action não é privada por padrão: é chamável por quem descobrir o id.
-- `middleware.ts` protege rotas privadas por prefixo (`export { auth as middleware } from '@/auth'` com `config.matcher`), mas é só a primeira camada. A checagem real fica dentro do handler.
+- `proxy.ts` (antigo `middleware.ts`, renomeado no Next 16) protege rotas privadas por prefixo (`export { auth as proxy } from "@/lib/auth"` com `config.matcher`), mas é só a primeira camada. A checagem real fica dentro do handler.
 - Verificar ownership antes de update e delete, filtrando pelo `userId` da sessão dentro da própria query.
 - Nunca confiar em UI escondida: botão oculto não é autorização. ID público como UUID, nunca inteiro sequencial.
 
@@ -63,7 +63,7 @@ await prisma.user.findUnique({ where: { email }, select: { id: true } }) // padr
 - Ambientes separados: dev e produção nunca compartilham banco nem secrets.
 
 ```ts
-// lib/rate-limit.ts - janela fixa em memória, uma instância
+// src/lib/rate-limit.ts - janela fixa em memória, uma instância
 const hits = new Map<string, { count: number; resetAt: number }>()
 export function rateLimit(key: string, limit = 5, windowMs = 60_000) {
   const now = Date.now()

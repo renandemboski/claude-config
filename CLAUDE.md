@@ -107,19 +107,7 @@ Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica 
 
 ## Estrutura de Projeto
 
-Um repositório por projeto, fullstack no Next.js.
-
-```text
-<projeto>/
-├── app/                    # Rotas, layouts e Route Handlers (App Router)
-├── components/             # Componentes de UI reutilizáveis
-├── features/<dominio>/     # Código por domínio (componentes, hooks, services)
-├── lib/                    # db (Prisma), auth, utils, cn
-├── prisma/                 # schema.prisma e migrations
-├── docker-compose.yml      # PostgreSQL para desenvolvimento
-├── .env.example            # Chaves com valores fictícios
-└── README.md
-```
+Um repositório por projeto, fullstack no Next.js. Estrutura de pastas em `rules/frontend.md` (app, components, features, lib) e `rules/backend.md` (Route Handlers, services, Prisma, Auth.js).
 
 - Nunca commitar `.env`, apenas `.env.example`.
 - `README.md` com stack, setup e como rodar. Variáveis de ambiente ficam só no `.env.example`, o README só aponta para ele.

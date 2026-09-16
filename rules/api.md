@@ -269,8 +269,8 @@ export async function DELETE(_request: NextRequest, { params }: Context): Promis
 ## Proteção de Rotas
 
 - Todo Route Handler que não seja público verifica a sessão antes de qualquer coisa.
-- `middleware.ts` bloqueia rotas privadas no geral, mas o handler valida de novo: middleware não substitui checagem no servidor.
-- Detalhes de Auth.js, sessão e middleware em `rules/backend.md`.
+- `proxy.ts` bloqueia rotas privadas no geral, mas o handler valida de novo: proxy não substitui checagem no servidor.
+- Detalhes de Auth.js, sessão e proxy em `rules/backend.md`.
 
 ```ts
 const session = await auth();

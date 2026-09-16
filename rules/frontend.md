@@ -7,36 +7,41 @@
 ## Estrutura de Pastas
 
 ```text
-app/                         # Rotas (App Router)
-├── layout.tsx               # Layout raiz
-├── page.tsx                 # Home
-├── loading.tsx              # Estado de carregamento da rota
-├── error.tsx                # Estado de erro da rota ("use client")
-├── not-found.tsx            # 404
-├── (auth)/                  # Grupo de rotas, não entra na URL
-├── <domain>/
-│   ├── page.tsx
-│   ├── [id]/page.tsx        # Rota dinâmica
-│   └── loading.tsx
-└── api/<resource>/route.ts  # Route Handlers
-components/ui/               # Primitivos de UI (Button, Input, Modal...)
-components/layout/           # Layout (Sidebar, Header, PageWrapper...)
-features/<domain>/           # Domínio, quando o projeto tem peso para isso
-├── components/
-├── hooks/
-├── services/                # Acesso a dados e regra de negócio
-└── schemas.ts               # Schemas Zod + tipos inferidos
-lib/
-├── db.ts                    # Instância singleton do PrismaClient
-├── auth/                    # Configuração do Auth.js
-├── cn.ts
-└── utils/                   # Funções puras
-prisma/schema.prisma         # Schema do banco (Prisma)
-styles/globals.css           # Tokens de cor e camadas do Tailwind
+<projeto>/
+├── prisma/                          # schema.prisma, migrations, seed (ver rules/database.md)
+└── src/
+    ├── app/                         # Rotas (App Router)
+    │   ├── layout.tsx               # Layout raiz
+    │   ├── page.tsx                 # Home
+    │   ├── loading.tsx              # Estado de carregamento da rota
+    │   ├── error.tsx                # Estado de erro da rota ("use client")
+    │   ├── not-found.tsx            # 404
+    │   ├── (auth)/                  # Grupo de rotas, não entra na URL
+    │   ├── <domain>/
+    │   │   ├── page.tsx
+    │   │   ├── [id]/page.tsx        # Rota dinâmica
+    │   │   └── loading.tsx
+    │   └── api/<resource>/route.ts  # Route Handlers
+    ├── components/ui/               # Primitivos de UI (Button, Input, Modal...)
+    ├── components/layout/           # Layout (Sidebar, Header, PageWrapper...)
+    ├── features/<domain>/           # Domínio, quando o projeto tem peso para isso
+    │   ├── components/
+    │   └── hooks/
+    ├── lib/
+    │   ├── db.ts                    # Instância singleton do PrismaClient
+    │   ├── auth.ts                  # Configuração do Auth.js
+    │   ├── services/                # Regra de negócio, um arquivo por domínio
+    │   ├── validations/             # Schemas Zod + tipos inferidos
+    │   ├── hooks/                   # Hooks globais (useDebounce...)
+    │   ├── cn.ts
+    │   └── utils/                   # Funções puras
+    ├── generated/prisma/            # Prisma Client gerado, nunca editar
+    ├── styles/globals.css           # Tokens de cor e camadas do Tailwind
+    └── proxy.ts                     # Auth.js na borda (antigo middleware.ts)
 ```
 
 - Projeto pequeno dispensa `features/`: deixar tudo em `lib/` e `components/`. Criar pasta de domínio só quando houver mais de um punhado de arquivos por assunto.
-- `app/` guarda rota, layout e estado de rota. Lógica de negócio mora em `features/<domain>/services/` ou `lib/`.
+- `app/` guarda rota, layout e estado de rota. Lógica de negócio mora em `lib/services/` (ver `rules/backend.md`).
 
 ## Server Components e Client Components
 
@@ -46,9 +51,9 @@ styles/globals.css           # Tokens de cor e camadas do Tailwind
 - Segredo (chave de API, string de conexão, token) nunca entra em componente cliente, nem por props.
 
 ```tsx
-// app/products/page.tsx - Server Component, sem "use client"
-import { listProducts } from "@/features/products/services/productService";
-import { ProductFilter } from "@/features/products/components/ProductFilter";
+// src/app/products/page.tsx - Server Component, sem "use client"
+import { listProducts } from "@/lib/services/products";
+import { ProductFilter } from "@/features/products/components/product-filter";
 
 export default async function ProductsPage() {
   const products = await listProducts();
@@ -57,7 +62,7 @@ export default async function ProductsPage() {
 ```
 
 ```tsx
-// features/products/components/ProductFilter.tsx
+// src/features/products/components/product-filter.tsx
 "use client";
 
 import { useState } from "react";
@@ -76,7 +81,7 @@ export function ProductFilter({ products }: { products: Product[] }) {
 - Nunca chamar `fetch` de rota interna (`/api/...`) dentro de um Server Component: chamar a função de service direto.
 
 ```ts
-// features/products/services/productService.ts
+// src/lib/services/products.ts
 import { db } from "@/lib/db";
 
 export async function listProducts(): Promise<Product[]> {
@@ -89,7 +94,7 @@ export async function listProducts(): Promise<Product[]> {
 - Helper de classes (composição condicional e merge de Tailwind): todo projeto usa `cn` de `lib/cn.ts`. Nunca instalar `clsx`. A única dependência é `tailwind-merge`, que resolve conflito de classes (`px-2` contra `px-4`) e embute a taxonomia inteira do Tailwind.
 
 ```ts
-// lib/cn.ts
+// src/lib/cn.ts
 import { twMerge } from "tailwind-merge";
 
 type ClassValue =
@@ -154,7 +159,7 @@ const variantClasses: Record<ButtonVariant, string> = {
 - Navegação programática e leitura da URL com `useRouter`, `usePathname` e `useSearchParams` de `next/navigation`, só em Client Component. No servidor, `params` e `searchParams` chegam por props da página.
 
 ```tsx
-// app/products/[id]/page.tsx
+// src/app/products/[id]/page.tsx
 import { notFound } from "next/navigation";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -169,7 +174,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
 - Todo formulário usa React Hook Form + Zod. Nunca gerenciar campo de formulário com `useState`. Para estado de UI (modal aberto, página atual, filtros), `useState` é normal e esperado.
 - Formulário é Client Component: `"use client"` no topo do arquivo.
-- Schema Zod em arquivo separado: `features/<domain>/schemas.ts`. O schema é a fonte da verdade, nunca duplicar validação.
+- Schema Zod em arquivo separado: `lib/validations/<domain>.ts`. O schema é a fonte da verdade, nunca duplicar validação.
 - O mesmo schema valida no servidor, no Route Handler ou na Server Action. Validação no cliente não substitui validação no servidor.
 - Erro de campo: inline abaixo do campo. Erro de API: toast.
 - Mensagens em português: `"O e-mail é obrigatório."`, não `"email: required"`.
@@ -189,14 +194,14 @@ Toda tela com dados assíncronos trata os 3 estados: carregando, erro e vazio.
 No servidor, o App Router resolve carregando e erro por arquivo:
 
 ```tsx
-// app/products/loading.tsx
+// src/app/products/loading.tsx
 export default function Loading() {
   return <Skeleton />;
 }
 ```
 
 ```tsx
-// app/products/error.tsx
+// src/app/products/error.tsx
 "use client";
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
@@ -232,28 +237,30 @@ if (!data?.length) return <EmptyState message="Nenhum item encontrado." />;
 
 ## Serviços e Route Handlers
 
-- Cada domínio tem `services/` com funções tipadas: consultas Prisma, regra de negócio e chamadas a APIs externas.
+- `lib/services/` tem um arquivo por domínio com funções tipadas: consultas Prisma, regra de negócio e chamadas a APIs externas.
 - Server Component chama o service direto. Route Handler chama o mesmo service, sem duplicar regra.
 - Route Handler valida a entrada com Zod antes de qualquer coisa e devolve status coerente (ver `rules/api.md`).
 - Toda rota que exige usuário logado confere a sessão do Auth.js antes de executar (ver `rules/security.md`).
 
 ```ts
-// app/api/products/route.ts
+// src/app/api/products/route.ts
 import { NextResponse } from "next/server";
-import { createProductSchema } from "@/features/products/schemas";
-import { createProduct } from "@/features/products/services/productService";
+import { errorResponse } from "@/lib/api-error";
+import { createProduct } from "@/lib/services/products";
+import { createProductSchema } from "@/lib/validations/products";
 
 export async function POST(request: Request) {
-  const parsed = createProductSchema.safeParse(await request.json());
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  try {
+    const data = createProductSchema.parse(await request.json());
+    const product = await createProduct(data);
+    return NextResponse.json(product, { status: 201 });
+  } catch (error) {
+    return errorResponse(error); // Zod vira 422, AppError vira o status dela, o resto vira 500
   }
-  const product = await createProduct(parsed.data);
-  return NextResponse.json(product, { status: 201 });
 }
 ```
 
-- No cliente, centralizar o tratamento de erro de resposta em `lib/utils/handleApiError.ts` e exibir mensagem em português. Nunca mostrar stack trace na tela.
+- No cliente, o tratamento de erro de resposta fica centralizado no `ApiError` de `lib/api/client.ts` (ver `rules/api.md`), com mensagem em português. Nunca mostrar stack trace na tela.
 
 ## Variáveis de Ambiente
 
@@ -268,7 +275,7 @@ export async function POST(request: Request) {
 - Fontes com `next/font`, carregadas no `layout.tsx` raiz e expostas como variável CSS. Nunca `<link>` para CDN de fonte.
 
 ```tsx
-// app/layout.tsx
+// src/app/layout.tsx
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -312,6 +319,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 - Cache com TanStack Query nos dados do cliente, especialmente em dashboard.
 - Evitar overfetching: selecionar só as colunas e os registros necessários na consulta.
 
+## SEO - Landing pages e páginas de marketing
+
+Toda página pública (landing, institucional, preços, blog, página de produto) nasce pensando em SEO. Página privada (dashboard, área logada) não indexa.
+
+- Antes de escrever o conteúdo, fechar com o usuário a palavra-chave principal e a intenção de busca de cada página. Título, H1, descrição e URL usam essa palavra-chave de forma natural, sem repetição forçada.
+- `metadata` ou `generateMetadata` em toda `page.tsx` pública: `title` (até 60 caracteres, palavra-chave no começo), `description` (até 160, com chamada para ação), `openGraph` (title, description, imagem 1200x630, url, siteName, locale `pt_BR`), `twitter` (`summary_large_image`) e `alternates.canonical`. `metadataBase` definido no layout raiz.
+- Um só `<h1>` por página, hierarquia `h2`/`h3` sem pular nível. Texto real em HTML, nunca só dentro de imagem.
+- URL curta, em kebab-case, sem parâmetro desnecessário. Slug em português para conteúdo em português.
+- Dados estruturados JSON-LD conforme o tipo da página (`Organization`, `WebSite`, `Product`, `FAQPage`, `Article`, `BreadcrumbList`) em `<script type="application/ld+json">`. Validar no Rich Results Test do Google.
+- `app/sitemap.ts` e `app/robots.ts` gerados pelo Next. Página privada recebe `robots: { index: false, follow: false }` no metadata.
+- Landing page é estática (SSG) ou ISR, nunca `force-dynamic` sem motivo: o crawler recebe o HTML completo do Server Component.
+- Imagem da primeira dobra com `priority` (é o LCP). As demais com lazy loading, que é o padrão do `next/image`.
+- Conteúdo suficiente para responder a intenção de busca e uma chamada para ação clara acima da dobra. Página fina (só título e botão) não ranqueia.
+- Critério de pronto: Lighthouse mobile com 90+ em Performance e SEO; LCP abaixo de 2,5 s, INP abaixo de 200 ms, CLS abaixo de 0,1.
+
 ## Formatação
 
 - Datas e moedas com `Intl.DateTimeFormat` e `Intl.NumberFormat`, nunca formatação manual.
@@ -329,7 +351,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 - Usar o formato de resposta paginada definido em `rules/api.md`.
 - `page`, `pageSize`, `sortBy` e `sortDirection` vivem nos query params da URL: a página fica compartilhável e sobrevive ao refresh.
-- `pageSize` padrão: 25. Opções disponíveis: 25, 50, 100, 200.
+- `pageSize` padrão: 25. Opções disponíveis: 25, 50, 100. A API limita a 100 (ver `rules/api.md`), então não oferecer valor acima disso.
 - Sempre exibir total de registros e página atual.
 - Componente reutilizável em `components/ui/Pagination.tsx`: seletor de itens por página, navegação de páginas e total de registros.
 
@@ -356,7 +378,7 @@ export function ProductsTable({ data }: { data: PaginatedResponse<Product> }) {
       pageSize={data.pageSize}
       totalCount={data.totalCount}
       totalPages={data.totalPages}
-      pageSizeOptions={[25, 50, 100, 200]}
+      pageSizeOptions={[25, 50, 100]}
       onPageChange={(page) => updateParams({ page: String(page) })}
       onPageSizeChange={(size) => updateParams({ pageSize: String(size), page: "1" })}
     />
