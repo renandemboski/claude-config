@@ -1,6 +1,6 @@
 # claude-config
 
-Configuração pessoal do Claude Code: regras, agentes, comandos e hooks.
+Configuração pessoal do Claude Code: regras, agente, comandos e hooks.
 
 Stack alvo: TypeScript, Next.js (App Router), PostgreSQL com Prisma, Auth.js, Tailwind, Vitest, npm.
 

@@ -32,7 +32,6 @@ Todo projeto nasce com formatador e linter configurados, antes da primeira featu
 npm i -D prettier eslint typescript-eslint eslint-config-prettier lint-staged simple-git-hooks
 ```
 
-
 ## Nomenclatura
 
 Todo identificador de código é em inglês: variáveis, funções, tipos, componentes, hooks, arquivos, pastas, modelos de banco, tabelas e colunas. Texto visível ao usuário final continua em português: labels, mensagens de erro e de validação, placeholders, conteúdo de tela. Comentário de código, quando existir, também em inglês.
