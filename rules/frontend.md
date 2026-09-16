@@ -253,7 +253,7 @@ export async function POST(request: Request) {
   try {
     const data = createProductSchema.parse(await request.json());
     const product = await createProduct(data);
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json({ data: product, message: "Produto criado com sucesso." }, { status: 201 });
   } catch (error) {
     return errorResponse(error); // Zod vira 422, AppError vira o status dela, o resto vira 500
   }

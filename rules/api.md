@@ -122,7 +122,7 @@ Erro:
 ```
 
 - `code` em `UPPER_SNAKE_CASE`.
-- `details` só quando há mais de um erro de campo.
+- `details` só em erro de validação: um item por campo inválido, como o `errorResponse` monta.
 - `message` sempre em português, escrita para o usuário final.
 - Nunca dado sensível na resposta: hash de senha, token, e-mail de terceiro.
 - Exceção intencional: listagens retornam `PaginatedResponse<T>` puro, sem o wrapper `{ data }`.
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { AppError, errorResponse } from "@/lib/api-error";
-import { updateProduct, deactivateProduct, getProduct } from "@/lib/services/products";
+import { updateProduct, deleteProduct, getProduct } from "@/lib/services/products";
 import { updateProductSchema } from "@/lib/validations/products";
 
 const routeParamsSchema = z.object({ id: z.uuid("Identificador inválido.") });
@@ -257,7 +257,7 @@ export async function PATCH(request: NextRequest, { params }: Context): Promise<
 export async function DELETE(_request: NextRequest, { params }: Context): Promise<NextResponse> {
   try {
     const { id } = routeParamsSchema.parse(await params);
-    await deactivateProduct(id);
+    await deleteProduct(id);
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

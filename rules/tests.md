@@ -79,7 +79,7 @@ it("disables the button when isLoading", () => {
 ```ts
 import { POST } from "@/app/api/products/route";
 
-it("returns 400 when payload is invalid", async () => {
+it("returns 422 when payload is invalid", async () => {
   const response = await POST(
     new Request("http://localhost/api/products", {
       method: "POST",
@@ -87,7 +87,8 @@ it("returns 400 when payload is invalid", async () => {
     }),
   );
 
-  expect(response.status).toBe(400);
+  expect(response.status).toBe(422);
+  expect((await response.json()).error.code).toBe("VALIDATION_ERROR");
 });
 ```
 
