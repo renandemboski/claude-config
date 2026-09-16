@@ -18,7 +18,7 @@ main            # Produção - sempre estável
 
 ## Nomes de Branch
 
-- Formato: `<tipo>/<short-description>` em ingles e `kebab-case`.
+- Formato: `<tipo>/<short-description>` em inglês e `kebab-case`.
 - Exemplos: `feature/user-registration`, `fix/login-redirect`, `refactor/split-services`.
 - Nunca espaços, acentos ou caracteres especiais.
 - Nunca branches genéricas como `teste`, `temp`, `nova-branch`.

@@ -67,7 +67,7 @@ export default async function ProductsPage() {
 
 import { useState } from "react";
 
-export function ProductFilter({ products }: { products: Product[] }) {
+export function ProductFilter({ products }: { products: ProductListItem[] }) {
   const [search, setSearch] = useState("");
   // ...
 }
@@ -82,10 +82,12 @@ export function ProductFilter({ products }: { products: Product[] }) {
 
 ```ts
 // src/lib/services/products.ts
-import { db } from "@/lib/db";
+import "server-only";
+import { prisma } from "@/lib/db";
+import { productListSelect, type ProductListItem } from "@/lib/services/products-select";
 
-export async function listProducts(): Promise<Product[]> {
-  return db.product.findMany();
+export async function listProducts(): Promise<ProductListItem[]> {
+  return prisma.product.findMany({ where: { deletedAt: null }, select: productListSelect });
 }
 ```
 
@@ -164,7 +166,7 @@ import { notFound } from "next/navigation";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = await fetchProduct(id);
+  const product = await getProduct(id);
   if (!product) notFound();
   return <ProductDetail product={product} />;
 }
@@ -205,7 +207,7 @@ export default function Loading() {
 "use client";
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
-  return <ErrorState message={error.message} onRetry={reset} />;
+  return <ErrorState message="Não foi possível carregar os produtos." onRetry={reset} />; // nunca error.message: pode vazar detalhe técnico
 }
 ```
 
@@ -398,7 +400,7 @@ Toda página pública (landing, institucional, preços, blog, página de produto
 - `page`, `pageSize`, `sortBy` e `sortDirection` vivem nos query params da URL: a página fica compartilhável e sobrevive ao refresh.
 - `pageSize` padrão: 25. Opções disponíveis: 25, 50, 100. A API limita a 100 (ver `rules/api.md`), então não oferecer valor acima disso.
 - Sempre exibir total de registros e página atual.
-- Componente reutilizável em `components/ui/Pagination.tsx`: seletor de itens por página, navegação de páginas e total de registros.
+- Componente reutilizável em `components/ui/pagination.tsx`: seletor de itens por página, navegação de páginas e total de registros.
 
 ### Exemplo
 

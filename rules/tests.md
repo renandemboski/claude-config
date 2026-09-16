@@ -53,7 +53,7 @@ Teste existe para pegar bug real, não para fazer volume. Antes de escrever, per
 
 ```tsx
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Button } from "./Button";
+import { Button } from "./button";
 
 it("calls onClick when clicked", () => {
   const onClick = vi.fn();
@@ -102,5 +102,5 @@ Playwright, só quando o projeto pedir teste ponta a ponta. Cobrir o fluxo crít
 
 ## Build - Validação final
 
-- `npm run build` e `npx tsc --noEmit` antes de entregar.
+- `npm run typecheck`, `npm run lint`, `npm run test` e `npm run build` antes de entregar (scripts fixos, ver `rules/codigo.md`).
 - Nunca entregar com erro ou warning de build.

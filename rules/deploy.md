@@ -119,8 +119,8 @@ Sem isso, escalar vira adivinhação.
 
 Ordem fixa, e qualquer passo que falhar interrompe o deploy:
 
-1. Lint e `tsc --noEmit`
-2. Testes (`npx vitest run`)
+1. `npm run lint` e `npm run typecheck`
+2. Testes (`npm run test`)
 3. Build (`npm run build`)
 4. Auditoria de dependência (`npm audit --audit-level=high`)
 5. Migration (`npx prisma migrate deploy`)

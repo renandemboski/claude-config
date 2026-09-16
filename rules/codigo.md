@@ -23,7 +23,7 @@ Todo projeto nasce com formatador e linter configurados, antes da primeira featu
 - **Prettier** decide a formatação. `.prettierrc` na raiz com poucas opções (`semi`, `singleQuote`, `printWidth`, `trailingComma`) e `.prettierignore`. Formatação nunca é discutida em review nem feita à mão.
 - **ESLint** em flat config (`eslint.config.mjs`) com `typescript-eslint` no preset `strict` e `eslint-config-prettier` por último, para não brigar com o Prettier. Em Next.js, incluir `eslint-config-next`.
 - **`.editorconfig`** na raiz: `indent_style = space`, `indent_size = 2`, `end_of_line = lf`, `charset = utf-8`, `trim_trailing_whitespace = true`, `insert_final_newline = true`.
-- **Scripts com nome fixo** no `package.json`: `lint`, `lint:fix`, `format`, `format:check`, `typecheck` (`tsc --noEmit`). CI, QA e agentes chamam esses nomes, nunca comando avulso.
+- **Scripts com nome fixo** no `package.json`: `lint`, `lint:fix`, `format`, `format:check`, `typecheck` (`tsc --noEmit`) e `test` (`vitest run`). CI, QA e agentes chamam esses nomes, nunca comando avulso.
 - **Pre-commit local**: `lint-staged` rodando Prettier e ESLint só nos arquivos staged, acionado por `simple-git-hooks` (mais leve que husky). Commit com erro de lint não passa; `--no-verify` continua proibido.
 - **Warning é erro**: `eslint --max-warnings 0`. Regra desligada só com comentário de uma linha dizendo o porquê.
 - Setup de projeto novo em um comando:
@@ -47,8 +47,9 @@ Todo identificador de código é em inglês: variáveis, funções, tipos, compo
 - `camelCase` variáveis/funções | `PascalCase` componentes/tipos | `kebab-case` arquivos/pastas
 - Componentes = substantivos (`UserCard`) | Funções = verbos (`fetchUser`)
 
-### Backend
+### Servidor (Next.js)
 
-- `PascalCase` classes, métodos, propriedades, DTOs | `camelCase` variáveis locais e parâmetros
-- `I` prefixo em interfaces: `IUserService`, `IUserRepository`
-- Sufixos por camada: `UserController`, `UserService`, `UserRepository`, `CreateUserDto`
+- Service é módulo de funções em `lib/services/<domain>.ts` (`listProducts`, `createProduct`): sem classe, sem interface com prefixo `I`, sem sufixo `Service`, `Controller` ou `Repository`.
+- Tipo de entrada vem do schema Zod e termina em `Input`: `CreateProductInput = z.infer<typeof createProductSchema>`.
+- Tipo de saída vem do Prisma Client e diz o recorte: `ProductListItem`, `ProductDetail`.
+- Erro de domínio é `AppError` com `code` em `UPPER_SNAKE_CASE` (`NOT_FOUND`, `UNAUTHORIZED`).

@@ -24,7 +24,7 @@ Criar commits seguindo Conventional Commits, mensagem em **inglês**, com valida
   | Variável/config | ``chore: update `MAX_RETRIES` `` |
   | Endpoint | ``feat: add `GET /users` `` |
   | Tipo/componente | ``refactor: rename `UserDto` to `UserResponse` `` |
-  | Caminho de pasta | ``chore: move files to `src/lib/auth/` `` |
+  | Caminho de pasta | ``chore: move files to `src/lib/services/` `` |
 - **NUNCA** commitar sem permissão explícita do usuário
 - **NUNCA** commitar sem confirmar a branch: mostrar a branch atual e perguntar se o commit é nela, em outra existente ou em uma nova criada a partir de `develop`
 - **NUNCA** dar `git push` sem permissão explícita do usuário, especialmente envolvendo `main`/`master`
@@ -62,8 +62,9 @@ Rodar em paralelo:
 ### 2. Validação pre-commit
 
 Rodar:
-- `npx tsc --noEmit`
+- `npm run typecheck`
 - `npm run lint`
+- `npm run test`
 - `npm run build`
 
 Se houver erros: corrigir ANTES de commitar. Warnings são bugs.
@@ -77,10 +78,10 @@ Analisar o diff e classificar no tipo correto:
 | `feat` | Nova funcionalidade | ``feat: add login validation to `LoginForm` `` |
 | `fix` | Correção de bug | ``fix: correct total price in `calculateTotal` `` |
 | `docs` | Documentação | ``docs: update install instructions`` |
-| `refactor` | Refatoração sem mudar comportamento | ``refactor: extract logic to `productService` `` |
+| `refactor` | Refatoração sem mudar comportamento | ``refactor: extract logic to `lib/services/products.ts` `` |
 | `chore` | Manutenção/config | ``chore: update project dependencies`` |
 | `style` | Formatação, espaçamento (sem lógica) | ``style: adjust `<Button/>` spacing`` |
-| `test` | Adição ou correção de testes | ``test: add `userService` tests`` |
+| `test` | Adição ou correção de testes | ``test: add tests for `lib/services/users.ts` `` |
 | `perf` | Melhoria de performance | ``perf: memoize list rendering with `useMemo` `` |
 | `ci` | Mudanças em pipelines/CI | ``ci: add build workflow to GitHub Actions`` |
 | `build` | Mudanças no sistema de build | ``build: update `next.config.ts` `` |
@@ -106,7 +107,7 @@ type: short description in english
 Regras da mensagem:
 - **Idioma: inglês.** Verbo no imperativo presente (`add`, `fix`, `remove`, `update`, `extract`, `rename`).
 - **Tudo em minúsculo**, exceto siglas (`API`, `JWT`, `URL`...) e nomes próprios de tecnologia (`React`, `Next.js`, `PostgreSQL`, `Prisma`...).
-- **Crases (`` ` ``) em destaques:** nomes de arquivos, tipos, funções, componentes, hooks, props, comandos, endpoints. Ex: `` `Button.tsx` ``, `` `userService` ``, `` `useAuth` ``, `` `isLoading` ``, `` `GET /users` ``.
+- **Crases (`` ` ``) em destaques:** nomes de arquivos, tipos, funções, componentes, hooks, props, comandos, endpoints. Ex: `` `button.tsx` ``, `` `listProducts` ``, `` `useAuth` ``, `` `isLoading` ``, `` `GET /users` ``.
 - Primeira linha: máximo 72 caracteres.
 - Sem escopo entre parênteses. A descrição já diz o que mudou, e o diff mostra onde.
 - Descrição: começa com verbo em minúsculo, sem ponto final.
@@ -120,8 +121,8 @@ Rodar `git branch --show-current` e apresentar:
 Branch atual: feature/auth-session
 
 Arquivos a commitar:
-  M  src/components/Button.tsx
-  A  src/hooks/useAuth.ts
+  M  src/components/ui/button.tsx
+  A  src/lib/hooks/use-auth.ts
 
 Mensagem:
   feat: add `useAuth` hook for session handling

@@ -167,7 +167,7 @@ Sem `.dockerignore` o `COPY . .` manda `node_modules` e `.next` da máquina para
 docker compose up -d                  # sobe o Postgres
 docker compose down                   # para o Postgres, mantém os dados
 docker compose down -v                # para e apaga os dados (reset do banco)
-docker compose logs -f db             # acompanha o log do banco
+docker compose logs -f database       # acompanha o log do banco
 
 docker build -t <project>:local .     # build da imagem de produção
 docker run --rm -p 3000:3000 --env-file .env <project>:local

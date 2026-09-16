@@ -22,14 +22,15 @@ Stack: TypeScript, Next.js App Router (sempre a versão mais recente), PostgreSQ
 - Nunca confiar em UI escondida: botão oculto não é autorização. ID público como UUID, nunca inteiro sequencial.
 
 ```ts
-const session = await auth()
-if (!session?.user?.id) return Response.json({ error: 'Não autenticado' }, { status: 401 })
+// dentro do try do Route Handler; o errorResponse converte o AppError (ver rules/backend.md)
+const session = await auth();
+if (!session?.user?.id) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401);
 
 const { count } = await prisma.note.updateMany({
-  where: { id: params.id, userId: session.user.id },
+  where: { id, userId: session.user.id, deletedAt: null },
   data: { title: parsed.title },
-})
-if (count === 0) return Response.json({ error: 'Não encontrado' }, { status: 404 })
+});
+if (count === 0) throw new AppError("Nota não encontrada.", "NOT_FOUND", 404);
 ```
 
 ### A02 - Cryptographic Failures
@@ -49,9 +50,9 @@ if (count === 0) return Response.json({ error: 'Não encontrado' }, { status: 40
 - Nome de coluna e direção de ordenação vindos do usuário passam por whitelist, nunca entram em SQL cru. Validar toda entrada com Zod antes de tocar no banco e nunca executar shell com input do usuário (`child_process.exec`).
 
 ```ts
-await prisma.$queryRawUnsafe(`select * from "User" where email = '${email}'`) // NUNCA
-await prisma.$queryRaw`select id from "User" where email = ${email}` // SQL cru parametrizado
-await prisma.user.findUnique({ where: { email }, select: { id: true } }) // padrão
+await prisma.$queryRawUnsafe(`select * from users where email = '${email}'`); // NUNCA
+await prisma.$queryRaw`select id from users where email = ${email}`; // SQL cru parametrizado
+await prisma.user.findUnique({ where: { email }, select: { id: true } }); // padrão
 ```
 
 ### A04 - Insecure Design
@@ -64,16 +65,17 @@ await prisma.user.findUnique({ where: { email }, select: { id: true } }) // padr
 
 ```ts
 // src/lib/rate-limit.ts - janela fixa em memória, uma instância
-const hits = new Map<string, { count: number; resetAt: number }>()
-export function rateLimit(key: string, limit = 5, windowMs = 60_000) {
-  const now = Date.now()
-  const entry = hits.get(key)
+const hits = new Map<string, { count: number; resetAt: number }>();
+
+export function rateLimit(key: string, limit = 5, windowMs = 60_000): { allowed: boolean } {
+  const now = Date.now();
+  const entry = hits.get(key);
   if (!entry || now > entry.resetAt) {
-    hits.set(key, { count: 1, resetAt: now + windowMs })
-    return { allowed: true }
+    hits.set(key, { count: 1, resetAt: now + windowMs });
+    return { allowed: true };
   }
-  entry.count += 1
-  return { allowed: entry.count <= limit }
+  entry.count += 1;
+  return { allowed: entry.count <= limit };
 }
 ```
 
@@ -87,15 +89,15 @@ export function rateLimit(key: string, limit = 5, windowMs = 60_000) {
 - Nunca retornar `error.message` ou stack trace em produção: detalhe vai para o log do servidor, cliente recebe mensagem genérica. `.env` fora do commit.
 
 ```ts
-// next.config.ts - async headers() { return [{ source: '/:path*', headers: securityHeaders }] }
+// next.config.ts - async headers() { return [{ source: "/:path*", headers: securityHeaders }]; }
 const securityHeaders = [
   // 'unsafe-inline' em script e style é o que o Next documenta para CSP sem nonce: o próprio Next injeta script inline no HTML.
   { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" },
-  { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'X-Frame-Options', value: 'DENY' },
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-]
+  { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+];
 ```
 
 ### A06 - Vulnerable and Outdated Components
@@ -113,7 +115,7 @@ const securityHeaders = [
 - Auth.js como única camada de autenticação. Sem auth caseira.
 - Cookie de sessão com `httpOnly: true`, `secure: true` em produção e `sameSite: 'lax'`.
 - Sessão curta (por exemplo 30 minutos de `maxAge`), renovada enquanto o usuário está ativo. Nunca guardar token em `localStorage` nem passar em query string.
-- Rate limit em login e reset de senha (ver A04). Logout invalida a sessão no servidor, não só apaga o cookie.
+- Rate limit em login e reset de senha (ver A04). Logout sempre por `signOut()` do Auth.js. Com sessão JWT (padrão em `rules/backend.md`) não existe registro no servidor para invalidar: por isso o `maxAge` curto e, se for preciso derrubar sessão à força, trocar para `strategy: "database"`.
 
 ### A08 - Software and Data Integrity Failures
 
@@ -149,7 +151,7 @@ const securityHeaders = [
 
 ## Servidor - Riscos Específicos
 
-- **Mass assignment**: schema Zod por operação, com `.strict()`. Nunca passar o body direto para `prisma.<model>.create` ou `update`: montar o objeto campo a campo a partir do resultado da validação.
+- **Mass assignment**: schema Zod por operação, com `z.strictObject()` (rejeita chave desconhecida; é a forma do Zod 4). Nunca passar o body direto para `prisma.<model>.create` ou `update`: montar o objeto campo a campo a partir do resultado da validação.
 - **Path traversal**: nunca concatenar input em caminho de arquivo. Resolver com `path.resolve` e conferir que o resultado começa no diretório base.
 - **Race condition**: transação (`prisma.$transaction`) em operação crítica e unique constraint no banco como última defesa.
 - **Migrations**: versionadas em `prisma/migrations/` e aplicadas por `prisma migrate deploy`. Nunca alterar o banco de produção na mão.

@@ -179,7 +179,7 @@ import Credentials from "next-auth/providers/credentials";
 import { authenticateUser } from "@/lib/services/users";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 60 * 30 }, // 30 min, renovada a cada request (ver rules/security.md)
   pages: { signIn: "/login" },
   providers: [
     Credentials({

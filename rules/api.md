@@ -19,15 +19,15 @@ Regra prática: se quem chama é a própria página do app, Server Action resolv
 - Nunca verbos na URL: `/api/getUser` está errado, o certo é `/api/users`.
 - Aninhar quando há relação direta: `/api/users/[id]/orders`.
 - Máximo 2 níveis: acima disso, preferir query param (`/api/orders?userId=123`).
-- Versionar pela URL só quando a API é consumida por terceiros: `app/api/v1/users/route.ts`. App pessoal de cliente único não precisa de versão.
+- Versionar pela URL só quando a API é consumida por terceiros: `src/app/api/v1/users/route.ts`. App pessoal de cliente único não precisa de versão.
 
 | Verbo | Uso | Arquivo |
 |-------|-----|---------|
-| `GET` | Buscar recurso(s) | `app/api/users/route.ts`, `app/api/users/[id]/route.ts` |
-| `POST` | Criar recurso | `app/api/users/route.ts` |
-| `PUT` | Substituir completo | `app/api/users/[id]/route.ts` |
-| `PATCH` | Atualizar parcial | `app/api/users/[id]/route.ts` |
-| `DELETE` | Remover recurso | `app/api/users/[id]/route.ts` |
+| `GET` | Buscar recurso(s) | `src/app/api/users/route.ts`, `src/app/api/users/[id]/route.ts` |
+| `POST` | Criar recurso | `src/app/api/users/route.ts` |
+| `PUT` | Substituir completo | `src/app/api/users/[id]/route.ts` |
+| `PATCH` | Atualizar parcial | `src/app/api/users/[id]/route.ts` |
+| `DELETE` | Remover recurso | `src/app/api/users/[id]/route.ts` |
 
 - `GET` e `DELETE` nunca têm body.
 - `POST` retorna `201` com o recurso criado e header `Location`.
@@ -75,7 +75,7 @@ Zod em toda fronteira: body, query params e route params. O schema é a fonte de
 // src/lib/validations/products.ts
 import { z } from "zod";
 
-export const createProductSchema = z.object({
+export const createProductSchema = z.strictObject({
   name: z.string().trim().min(1, "Informe o nome.").max(120),
   price: z.number().positive("Preço deve ser maior que zero."),
   categoryId: z.uuid("Categoria inválida."),
@@ -342,5 +342,5 @@ export function useProducts(filters: Record<string, string>) {
 ## Versionamento
 
 - Versionar só quando existe consumidor externo que você não controla.
-- Breaking change vira nova pasta: `app/api/v2/products/route.ts`.
+- Breaking change vira nova pasta: `src/app/api/v2/products/route.ts`.
 - Manter a versão anterior ativa durante a migração.
