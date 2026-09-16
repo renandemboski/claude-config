@@ -82,13 +82,15 @@ export function rateLimit(key: string, limit = 5, windowMs = 60_000) {
 **Ataque:** CORS liberado, stack trace exposto, headers de segurança ausentes. **Mitigação:**
 
 - Headers de segurança no `next.config.ts`, aplicados em `/:path*`.
+- CSP estrita (nonce gerado no `proxy.ts`, `script-src 'self' 'nonce-...' 'strict-dynamic'`) só quando o app inteiro é dinâmico e o dado exige: nonce força renderização por request e desliga SSG, ISR e cache de CDN. Landing page e página pública ficam com a CSP sem nonce abaixo.
 - CORS restritivo em Route Handler público: lista explícita de origens, nunca `*` quando a rota lê a sessão.
 - Nunca retornar `error.message` ou stack trace em produção: detalhe vai para o log do servidor, cliente recebe mensagem genérica. `.env` fora do commit.
 
 ```ts
 // next.config.ts - async headers() { return [{ source: '/:path*', headers: securityHeaders }] }
 const securityHeaders = [
-  { key: 'Content-Security-Policy', value: "default-src 'self'; frame-ancestors 'none'" },
+  // 'unsafe-inline' em script e style é o que o Next documenta para CSP sem nonce: o próprio Next injeta script inline no HTML.
+  { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" },
   { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -138,7 +140,7 @@ const securityHeaders = [
 
 ## Frontend - Riscos Específicos
 
-- **XSS**: React escapa por padrão. `dangerouslySetInnerHTML` só com HTML sanitizado: `<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />`. CSP sem `'unsafe-eval'`.
+- **XSS**: React escapa por padrão. `dangerouslySetInnerHTML` só com HTML sanitizado (exceção: string fixa escrita no próprio código, como o script de tema do `rules/frontend.md`): `<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />`. CSP sem `'unsafe-eval'`.
 - **URL do usuário em `href` ou `src`**: validar que começa com `https://`. Bloquear `javascript:` e `data:`.
 - **CSRF**: Server Actions já trazem proteção nativa por checagem de origem. Em Route Handler que muda estado, manter cookie `SameSite=Lax` e conferir o header `Origin`.
 - **Clickjacking**: `X-Frame-Options: DENY` mais CSP `frame-ancestors 'none'`. **Tabnabbing**: `rel="noopener noreferrer"` em todo `target="_blank"`.

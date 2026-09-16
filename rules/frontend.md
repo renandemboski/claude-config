@@ -298,6 +298,51 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 - Nunca adicionar `* { padding: 0; margin: 0 }`: o Preflight já faz o reset.
 - Componentes compõem classes com o `cn` de `lib/cn.ts`.
 
+### Modo escuro - básico obrigatório
+
+Todo projeto nasce com modo claro e escuro. Não é feature para depois: quando o design não define as cores do escuro, derivar do claro e confirmar com o usuário.
+
+- Token semântico, nunca cor crua: `--background`, `--foreground`, `--primary`, `--muted`, `--border`. O componente usa `bg-background text-foreground`; a cor real muda por tema.
+- Os dois temas vivem no `styles/globals.css`: valores claros em `:root`, escuros em `.dark`, e o `@theme inline` liga cada token ao Tailwind. `@theme` só funciona no topo do arquivo, por isso a troca fica fora dele.
+- Ativação por classe, não por `prefers-color-scheme` direto: `@custom-variant dark (&:where(.dark, .dark *));`. Assim o usuário consegue trocar à mão.
+- Padrão inicial segue o sistema; escolha manual persiste em `localStorage.theme`. Um `<script>` inline no `<head>` do layout raiz aplica a classe `dark` no `<html>` antes da primeira pintura, para não piscar. `<html suppressHydrationWarning>` porque a classe muda no cliente.
+- Nunca `dark:bg-gray-800` solto em componente. Se um componente precisa de uma cor que não existe, cria o token nos dois temas primeiro.
+- Contraste de 4.5:1 vale nos dois temas: conferir o escuro também, não só o claro.
+- O script inline do tema só roda se a CSP permitir script inline. A CSP padrão do `rules/security.md` já permite; com CSP de nonce, passar o nonce no `<script>`.
+
+```css
+/* src/styles/globals.css */
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0 0);
+}
+
+.dark {
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.98 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+```
+
+```tsx
+// src/app/layout.tsx - trecho: aplica o tema antes da primeira pintura
+<html lang="pt-BR" suppressHydrationWarning>
+  <head>
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `document.documentElement.classList.toggle("dark", localStorage.theme === "dark" || (!("theme" in localStorage) && matchMedia("(prefers-color-scheme: dark)").matches))`,
+      }}
+    />
+  </head>
+```
+
 ## Acessibilidade
 
 - Todo elemento interativo acessível pelo teclado (`Tab`, `Enter`, `Escape`).
