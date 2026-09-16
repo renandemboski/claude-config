@@ -22,8 +22,8 @@ No Windows, a pasta é `C:\Users\<usuario>\.claude`.
 |-------|----------|
 | `CLAUDE.md` | Regras gerais: escrita, estilo de resposta, stack, fluxo de trabalho |
 | `rules/` | Regras por área, lidas sob demanda antes de codar |
-| `agents/` | Time de 8 agentes: refinamento, plano, contrato de API, implementação, QA, segurança, docs |
-| `commands/` | `/commit`, `/dev-team` e `/gauntlet` (loop de qualidade com crítico cego) |
+| `agents/` | `critic`, o crítico cego usado pelo `/gauntlet` |
+| `commands/` | `/commit` e `/gauntlet` (loop de qualidade com crítico cego) |
 | `hooks/` | Guardas de git (commit, push, segredos), de escrita (travessão e emoji) e formatação |
 
 ## Hooks

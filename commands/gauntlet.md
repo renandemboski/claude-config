@@ -55,8 +55,8 @@ Quebrar o objetivo em partes que melhoram de forma independente. Para cada parte
 
 ```text
 Parte      | Evidência                          | Referência                  | Builder
-hero       | screenshot 1440x900 via script     | reference/hero-ref.png      | frontend-dev
-ranking    | saída de vitest + tempo p95        | gabarito.md itens 1 a 4     | backend-dev
+hero       | screenshot 1440x900 via script     | reference/hero-ref.png      | builder de UI
+ranking    | saída de vitest + tempo p95        | gabarito.md itens 1 a 4     | builder de servidor
 ```
 
 Parte sem evidência mecânica ou sem referência não entra no loop.
