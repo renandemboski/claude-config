@@ -1,6 +1,6 @@
 # Regras de Segurança - Next.js, OWASP Top 10 e Boas Práticas
 
-Stack: TypeScript, Next.js App Router (sempre a versão mais recente), PostgreSQL com Prisma ORM, Auth.js com sessão em cookie HttpOnly, npm.
+Stack: TypeScript, Next.js App Router, PostgreSQL com Prisma ORM, Auth.js com sessão em cookie HttpOnly, npm.
 
 ## Princípios Gerais
 

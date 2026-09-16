@@ -79,7 +79,7 @@ Trocar `finance` pelo nome do projeto nos quatro lugares: `name`, `container_nam
 
 ### Regras
 
-- Versão fixada na imagem (`postgres:17.5-alpine`), nunca `latest`.
+- Versão fixada na imagem (`postgres:17.5-alpine`), nunca `latest`. O número aqui é exemplo: conferir a major estável atual em postgresql.org antes de copiar (ver `rules/codigo.md`).
 - Credenciais via `env_file` ou variável de ambiente, nunca no arquivo.
 - Volume nomeado para os dados: `<project>-database-data`. Bind mount de dados do Postgres dá problema de permissão.
 - `init.sql` montado como somente leitura, roda apenas na primeira criação do volume: serve para extensão (`create extension if not exists "pgcrypto"`), não para tabela. Estrutura é `prisma migrate`, sempre.
@@ -136,7 +136,7 @@ CMD ["node", "server.js"]
 
 - Três estágios: `deps` instala, `builder` compila, `runner` só recebe o resultado. A imagem final não tem código-fonte nem devDependencies.
 - `npm ci` com `package-lock.json` copiado antes do resto do código: o cache de camada só invalida quando o lock muda.
-- Versão fixada do Node (`node:22.14-alpine`), nunca `latest`.
+- Versão fixada do Node (`node:22.14-alpine`), nunca `latest`. O número aqui é exemplo: usar a LTS atual de nodejs.org, a mesma do `engines` do `package.json`.
 - Usuário não-root (`nextjs`) e `--chown` nos artefatos copiados.
 - `standalone` já traz o `server.js` e só as dependências usadas: o comando final é `node server.js`, nunca `npm start`.
 - `npx prisma generate` roda antes do `npm run build`: o client gerado precisa existir na hora de compilar. Com o client gerado dentro de `src/`, o `standalone` já o carrega junto.

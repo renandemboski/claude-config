@@ -2,7 +2,7 @@
 
 > Regras universais, válidas para todo projeto Next.js.
 > Projeto fullstack em um repositório só: UI, Route Handlers, acesso ao banco e autenticação convivem no mesmo app.
-> Sempre usar a versão mais recente do Next.js com App Router. Gerenciador de pacotes: npm.
+> Next.js com App Router. Gerenciador de pacotes: npm. Padrões universais e versões em `rules/codigo.md`.
 
 ## Estrutura de Pastas
 

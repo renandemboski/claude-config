@@ -7,6 +7,9 @@
 - Nunca `any` em TypeScript. Tipar tudo explicitamente.
 - Nunca hardcodar cores, URLs, secrets ou credenciais: usar tokens e variáveis de ambiente.
 - Nunca instalar dependência sem verificar se o projeto já resolve com o que tem.
+- Toda tecnologia entra na versão estável mais recente: Next.js, React, Node (LTS atual), PostgreSQL, Prisma, Tailwind, Zod, Auth.js e qualquer outra dependência. Nunca beta, canary, RC nem major em fim de suporte.
+- Antes de instalar ou fixar versão, conferir a estável atual na fonte oficial (site do projeto, npm, Context7), nunca de memória. Número de versão escrito nestas rules é exemplo e pode estar velho.
+- Onde se fixa versão, fixar exata: tag de imagem Docker, `engines` no `package.json`, lockfile commitado. "Mais recente" decide o que escolher na hora; depois disso a versão fica travada até alguém atualizar de propósito.
 - Dependência que deixou de ser usada sai do projeto na mesma tarefa: `npm uninstall`, nunca deixar pacote morto no `package.json`. Antes de encerrar, conferir se toda dependência instalada ainda tem import em uso; vale também para a que foi instalada só para testar uma ideia.
 - Nunca usar biblioteca paga, com plano gratuito limitado, trial ou licença restritiva (comercial, GPL, AGPL, SSPL, "source available") sem permissão explícita do usuário. Antes de propor, checar a licença e o custo. Preferir open source com licença permissiva: MIT, Apache 2.0, ISC, BSD.
 - Serviço externo pago ou com cota (API, SaaS, chave de terceiro) segue a mesma regra: propor primeiro, usar só depois do aval.

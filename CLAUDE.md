@@ -92,7 +92,7 @@ Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica 
 
 | Camada | Tecnologias |
 |--------|-------------|
-| **Framework** | Next.js (App Router), sempre a versão mais recente |
+| **Framework** | Next.js (App Router) |
 | **Linguagem** | TypeScript |
 | **Banco de dados** | PostgreSQL com Prisma ORM |
 | **Autenticação** | Auth.js (NextAuth) |
@@ -104,6 +104,8 @@ Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica 
 | **Datas** | date-fns |
 | **Testes** | Vitest, Testing Library |
 | **Pacotes** | npm |
+
+Tudo na versão estável mais recente, conferida na fonte oficial antes de instalar, nunca de memória. Vale para cada linha da tabela e para qualquer dependência que entrar depois (ver `rules/codigo.md`).
 
 ## Estrutura de Projeto
 
