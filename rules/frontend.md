@@ -266,10 +266,7 @@ export async function POST(request: Request) {
 
 ## Variáveis de Ambiente
 
-- Só variáveis com prefixo `NEXT_PUBLIC_` chegam ao navegador: `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_APP_URL`.
-- Segredo fica sem prefixo e só é lido em código de servidor: `DATABASE_URL`, `AUTH_SECRET`.
-- Nunca colocar segredo em variável `NEXT_PUBLIC_`, nem importar módulo de servidor dentro de Client Component.
-- Manter `.env.example` atualizado com todas as chaves e valores fictícios.
+Regras, `env.ts` validado com Zod e o que pode ter prefixo `NEXT_PUBLIC_`: `rules/backend.md`. No cliente vale uma coisa só: Client Component lê `process.env.NEXT_PUBLIC_*` e nunca importa `env.ts`, service ou `prisma`.
 
 ## Imagens e Fontes
 

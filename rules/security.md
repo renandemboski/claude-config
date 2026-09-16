@@ -161,16 +161,13 @@ const securityHeaders = [
 ## Secrets e Credenciais
 
 - `.env` e `.env.local` nunca commitados. `.env.example` versionado com valores fictícios.
-- Apenas variáveis `NEXT_PUBLIC_` chegam ao cliente. Connection string, `AUTH_SECRET` e chaves de provedor ficam no servidor.
 - Em produção, secrets no painel do provedor de deploy, não em arquivo.
 - Credencial vazada é credencial queimada: rotacionar na hora. Remover do commit não resolve, o histórico guarda.
 - `gitleaks` ou equivalente em pre-commit hook.
 
 ## Validação de Input
 
-- Um schema Zod por operação, no servidor, antes de qualquer acesso ao banco.
-- Validar tipo, tamanho mínimo e máximo, formato, range e whitelist de valores.
-- O mesmo schema pode servir ao formulário, mas a validação que conta é a do servidor: atacante chama a rota direto com curl.
+Padrão de validação (Zod em toda fronteira, um schema por operação, `lib/validations/`): `rules/backend.md`. O que importa aqui: a validação que conta é a do servidor. O mesmo schema pode rodar no formulário, mas atacante chama a rota direto com curl.
 
 ## Uploads de Arquivo
 

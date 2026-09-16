@@ -25,16 +25,7 @@ main            # Produção - sempre estável
 
 ## Commits - Conventional Commits
 
-O padrão completo de mensagem (idioma, minúsculas, siglas, crases, tipos e exemplos) mora em `~/.claude/commands/commit.md`. Usar `/commit` para gerar commits padronizados.
-
-Essencial:
-
-- Formato: `<type>: <description>`, em inglês. Sem escopo entre parênteses.
-- Descrição com verbo no imperativo presente em minúsculo (`add`, `fix`, `remove`), sem ponto final. Primeira linha com máximo 72 caracteres.
-- Tipos: `feat`, `fix`, `docs`, `refactor`, `chore`, `style`, `test`, `perf`, `ci`, `build`, `revert`.
-- Mensagem curta, de linha única por padrão. Corpo é exceção e tem no máximo 4 linhas, explicando o porquê.
-- **Nunca** incluir `Co-Authored-By`. **Nunca** usar travessão (`—`): hífen com espaços, vírgula ou dois-pontos.
-- Exemplo: ``feat: add user registration to `UserForm` ``
+Formato, idioma, tipos, crases, tamanho e exemplos moram em `~/.claude/commands/commit.md`, fonte única. Usar `/commit` para gerar o commit; o hook `pre-commit-msg-guard.sh` barra mensagem fora do padrão.
 
 ## Pull Requests
 

@@ -226,6 +226,6 @@ npx prisma generate                            # regera o client após mudar o s
 ## Inegociáveis
 
 - Nunca alterar o banco sem permissão explícita do usuário.
-- `DATABASE_URL` só em `.env`, nunca commitada. `.env.example` com valor fictício.
+- `DATABASE_URL` só em `.env`, nunca commitada.
 - Nenhum acesso ao banco fora do servidor (ver `rules/backend.md`).
 - Nunca commitar dump, volume ou backup.
