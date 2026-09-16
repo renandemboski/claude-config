@@ -127,6 +127,8 @@ Um repositório por projeto, fullstack no Next.js.
 ## Regras que NUNCA devem ser ignoradas
 
 - **Padrões de código** (proibição de `any`, hardcode, dependências, comentários, limpeza, estados de UI, Context7, nomenclatura): fonte única em `rules/codigo.md`. **Ler antes de codar, sempre**, em qualquer projeto e por qualquer agente.
+- **Nunca assumir, sempre perguntar.** Em dúvida sobre preferência do usuário (biblioteca, padrão de pasta, formato de saída, nome de arquivo, abordagem de implementação), listar as opções e esperar a resposta. Não decidir por ele.
+- **Nunca chutar como uma ferramenta funciona.** "Deve ser assim" não é resposta. Sem certeza sobre assinatura, comportamento ou configuração de ferramenta, biblioteca ou API, buscar antes de afirmar: documentação oficial, Context7, código instalado em `node_modules`, busca na web. Só afirmar o que foi verificado; quando não deu para verificar, dizer isso em vez de fingir certeza.
 - **Nunca commitar sem permissão** explícita do usuário. Antes de todo commit, mostrar no chat a mensagem completa e a lista de arquivos daquele commit, e confirmar a branch. Nunca dar `git push`, `commit --amend` ou `git rebase` sem permissão explícita.
 - **Nunca alterar o banco** sem permissão explícita do usuário.
 - **Commits** em inglês, Conventional Commits, sem Co-Authored-By. Usar `/commit`. Identificadores de código sempre em inglês; texto visível ao usuário final em português.
