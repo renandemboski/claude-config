@@ -1,6 +1,6 @@
 # Regras de Segurança - Next.js, OWASP Top 10 e Boas Práticas
 
-Stack: TypeScript, Next.js App Router, PostgreSQL com Prisma ORM, Auth.js com sessão em cookie HttpOnly, npm.
+Stack: TypeScript, Next.js App Router, PostgreSQL com Prisma ORM, Better Auth com sessão no banco e cookie HttpOnly, npm.
 
 ## Princípios Gerais
 
@@ -16,15 +16,15 @@ Stack: TypeScript, Next.js App Router, PostgreSQL com Prisma ORM, Auth.js com se
 
 **Ataque:** usuário lê ou altera recurso de outro usuário (IDOR), escala privilégio, chama ação sem permissão. **Mitigação:**
 
-- Verificar a sessão do Auth.js em **todo** Route Handler e **toda** Server Action. Server Action não é privada por padrão: é chamável por quem descobrir o id.
-- `proxy.ts` (antigo `middleware.ts`, renomeado no Next 16) protege rotas privadas por prefixo (`export { auth as proxy } from "@/lib/auth"` com `config.matcher`), mas é só a primeira camada. A checagem real fica dentro do handler.
+- Verificar a sessão do Better Auth (`auth.api.getSession`) em **todo** Route Handler e **toda** Server Action. Server Action não é privada por padrão: é chamável por quem descobrir o id.
+- `proxy.ts` (antigo `middleware.ts`, renomeado no Next 16) faz redirect otimista por cookie de sessão (`getSessionCookie` de `better-auth/cookies` com `config.matcher`, ver `rules/backend.md`), mas é só a primeira camada. A checagem real fica dentro do handler.
 - Verificar ownership antes de update e delete, filtrando pelo `userId` da sessão dentro da própria query.
 - Nunca confiar em UI escondida: botão oculto não é autorização. ID público como UUID, nunca inteiro sequencial.
 
 ```ts
 // dentro do try do Route Handler; o errorResponse converte o AppError (ver rules/backend.md)
-const session = await auth();
-if (!session?.user?.id) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401);
+const session = await auth.api.getSession({ headers: await headers() });
+if (!session) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401);
 
 const { count } = await prisma.note.updateMany({
   where: { id, userId: session.user.id, deletedAt: null },
@@ -37,8 +37,8 @@ if (count === 0) throw new AppError("Nota não encontrada.", "NOT_FOUND", 404);
 
 **Ataque:** interceptação de dados em trânsito, leitura de dados sensíveis em repouso. **Mitigação:**
 
-- HTTPS obrigatório em produção, com HSTS. `AUTH_SECRET` forte e diferente por ambiente.
-- Senha nunca em plain text: login por credenciais usa hash argon2 ou bcrypt. Dado sensível (CPF, cartão, token de integração) criptografado em repouso.
+- HTTPS obrigatório em produção, com HSTS. `BETTER_AUTH_SECRET` forte (32 caracteres ou mais) e diferente por ambiente.
+- Senha nunca em plain text: o hash é do Better Auth (scrypt), nunca implementar hash próprio. Dado sensível (CPF, cartão, token de integração) criptografado em repouso.
 - Sessão em cookie HttpOnly. Token nunca em `localStorage` nem `sessionStorage`.
 
 ### A03 - Injection
@@ -112,10 +112,10 @@ const securityHeaders = [
 
 **Ataque:** credential stuffing, sessão sem expiração, cookie roubado. **Mitigação:**
 
-- Auth.js como única camada de autenticação. Sem auth caseira.
+- Better Auth como única camada de autenticação. Sem auth caseira, sem JWT manual.
 - Cookie de sessão com `httpOnly: true`, `secure: true` em produção e `sameSite: 'lax'`.
-- Sessão curta (por exemplo 30 minutos de `maxAge`), renovada enquanto o usuário está ativo. Nunca guardar token em `localStorage` nem passar em query string.
-- Rate limit em login e reset de senha (ver A04). Logout sempre por `signOut()` do Auth.js. Com sessão JWT (padrão em `rules/backend.md`) não existe registro no servidor para invalidar: por isso o `maxAge` curto e, se for preciso derrubar sessão à força, trocar para `strategy: "database"`.
+- `expiresIn` e `updateAge` da sessão definidos de propósito no `auth.ts` (ver `rules/backend.md`); app com dado sensível encurta. Nunca guardar token em `localStorage` nem passar em query string.
+- Rate limit em login e reset de senha (ver A04). Logout por `signOut()`; a sessão fica no banco, então `auth.api.revokeSession` e `revokeOtherSessions` derrubam sessão de verdade (troca de senha revoga as outras).
 
 ### A08 - Software and Data Integrity Failures
 
@@ -186,7 +186,7 @@ Padrão de validação (Zod em toda fronteira, um schema por operação, `lib/va
 - Sempre limitar `pageSize` com teto (`Math.min(pageSize, 100)`). Sem teto, `pageSize=999999` derruba a aplicação.
 - Sempre usar whitelist de campos de ordenação, com mapa explícito de string para campo do modelo. String arbitrária deixa o atacante ordenar por `passwordHash` e inferir valores.
 - Sempre aplicar o mesmo filtro de dono nas rotas de export (CSV, PDF). É o lugar que mais escapa.
-- Nunca aceitar `userId`, `role`, `isAdmin` ou `plan` vindos do body. Esses valores saem da sessão do Auth.js.
+- Nunca aceitar `userId`, `role`, `isAdmin` ou `plan` vindos do body. Esses valores saem de `session.user` do Better Auth.
 - Nunca retornar o modelo inteiro do banco. Sempre `select` explícito: `prisma.user.findMany({ select: { id: true, name: true } })`. Sem isso, `passwordHash`, tokens e campos internos vazam.
 - Nunca reaproveitar o schema de criação no update sem revisar quais campos podem mudar.
 - Sempre checar sessão na primeira linha de Route Handler e Server Action, mesmo quando a página só aparece para quem tem acesso.
@@ -197,7 +197,7 @@ Padrão de validação (Zod em toda fronteira, um schema por operação, `lib/va
 
 - [ ] HTTPS obrigatório, HSTS habilitado e headers de segurança no `next.config.ts`
 - [ ] CORS restritivo nas rotas públicas, sem `*`
-- [ ] Sessão do Auth.js checada em todo Route Handler e Server Action
+- [ ] Sessão do Better Auth checada em todo Route Handler e Server Action
 - [ ] Ownership verificado na query de update e delete
 - [ ] Cookie de sessão HttpOnly, Secure e SameSite, com expiração curta
 - [ ] Rate limit em login e reset de senha

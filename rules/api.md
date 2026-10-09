@@ -43,7 +43,7 @@ src/app/api/
 │   └── [id]/
 │       └── route.ts        # GET, PUT, PATCH, DELETE
 └── auth/
-    └── [...nextauth]/
+    └── [...all]/
         └── route.ts
 ```
 
@@ -270,11 +270,11 @@ export async function DELETE(_request: NextRequest, { params }: Context): Promis
 
 - Todo Route Handler que não seja público verifica a sessão antes de qualquer coisa.
 - `proxy.ts` bloqueia rotas privadas no geral, mas o handler valida de novo: proxy não substitui checagem no servidor.
-- Detalhes de Auth.js, sessão e proxy em `rules/backend.md`.
+- Detalhes de Better Auth, sessão e proxy em `rules/backend.md`.
 
 ```ts
-const session = await auth();
-if (!session?.user) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401);
+const session = await auth.api.getSession({ headers: await headers() });
+if (!session) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401);
 ```
 
 ## Consumo no Cliente

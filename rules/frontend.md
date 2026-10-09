@@ -29,7 +29,8 @@
     │   └── hooks/
     ├── lib/
     │   ├── db.ts                    # Instância singleton do PrismaClient
-    │   ├── auth.ts                  # Configuração do Auth.js
+    │   ├── auth.ts                  # Configuração do Better Auth (servidor)
+    │   ├── auth-client.ts           # createAuthClient, só em Client Component
     │   ├── services/                # Regra de negócio, um arquivo por domínio
     │   ├── validations/             # Schemas Zod + tipos inferidos
     │   ├── hooks/                   # Hooks globais (useDebounce...)
@@ -37,7 +38,7 @@
     │   └── utils/                   # Funções puras
     ├── generated/prisma/            # Prisma Client gerado, nunca editar
     ├── styles/globals.css           # Tokens de cor e camadas do Tailwind
-    └── proxy.ts                     # Auth.js na borda (antigo middleware.ts)
+    └── proxy.ts                     # Redirect otimista por cookie de sessão (antigo middleware.ts)
 ```
 
 - Projeto pequeno dispensa `features/`: deixar tudo em `lib/` e `components/`. Criar pasta de domínio só quando houver mais de um punhado de arquivos por assunto.
@@ -84,10 +85,16 @@ export function ProductFilter({ products }: { products: ProductListItem[] }) {
 // src/lib/services/products.ts
 import "server-only";
 import { prisma } from "@/lib/db";
-import { productListSelect, type ProductListItem } from "@/lib/services/products-select";
+import {
+  productListSelect,
+  type ProductListItem,
+} from "@/lib/services/products-select";
 
 export async function listProducts(): Promise<ProductListItem[]> {
-  return prisma.product.findMany({ where: { deletedAt: null }, select: productListSelect });
+  return prisma.product.findMany({
+    where: { deletedAt: null },
+    select: productListSelect,
+  });
 }
 ```
 
@@ -109,7 +116,8 @@ type ClassValue =
   | { [key: string]: unknown };
 
 function flatten(value: ClassValue): string {
-  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (typeof value === "string" || typeof value === "number")
+    return String(value);
   if (!value || value === true) return "";
   if (Array.isArray(value)) return value.map(flatten).filter(Boolean).join(" ");
   return Object.entries(value)
@@ -164,7 +172,11 @@ const variantClasses: Record<ButtonVariant, string> = {
 // src/app/products/[id]/page.tsx
 import { notFound } from "next/navigation";
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const product = await getProduct(id);
   if (!product) notFound();
@@ -184,7 +196,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 - Usar `resolver` via `@hookform/resolvers/zod`.
 
 ```tsx
-const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Schema>({
+const {
+  register,
+  handleSubmit,
+  formState: { errors, isSubmitting },
+} = useForm<Schema>({
   resolver: zodResolver(schema),
 });
 ```
@@ -206,21 +222,33 @@ export default function Loading() {
 // src/app/products/error.tsx
 "use client";
 
-export default function Error({ error, reset }: { error: Error; reset: () => void }) {
-  return <ErrorState message="Não foi possível carregar os produtos." onRetry={reset} />; // nunca error.message: pode vazar detalhe técnico
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
+  return (
+    <ErrorState
+      message="Não foi possível carregar os produtos."
+      onRetry={reset}
+    />
+  ); // nunca error.message: pode vazar detalhe técnico
 }
 ```
 
 O estado vazio é sempre do componente, o App Router não cobre isso:
 
 ```tsx
-if (!products.length) return <EmptyState message="Nenhum produto encontrado." />;
+if (!products.length)
+  return <EmptyState message="Nenhum produto encontrado." />;
 ```
 
 No cliente com TanStack Query, os 3 estados ficam no componente:
 
 ```tsx
-const { data, isLoading, isError, refetch } = useQuery({ /* ... */ });
+const { data, isLoading, isError, refetch } = useQuery({/* ... */});
 
 if (isLoading) return <Skeleton />;
 if (isError) return <ErrorState onRetry={refetch} />;
@@ -242,7 +270,7 @@ if (!data?.length) return <EmptyState message="Nenhum item encontrado." />;
 - `lib/services/` tem um arquivo por domínio com funções tipadas: consultas Prisma, regra de negócio e chamadas a APIs externas.
 - Server Component chama o service direto. Route Handler chama o mesmo service, sem duplicar regra.
 - Route Handler valida a entrada com Zod antes de qualquer coisa e devolve status coerente (ver `rules/api.md`).
-- Toda rota que exige usuário logado confere a sessão do Auth.js antes de executar (ver `rules/security.md`).
+- Toda rota que exige usuário logado confere a sessão do Better Auth antes de executar (ver `rules/backend.md` e `rules/security.md`).
 
 ```ts
 // src/app/api/products/route.ts
@@ -255,7 +283,10 @@ export async function POST(request: Request) {
   try {
     const data = createProductSchema.parse(await request.json());
     const product = await createProduct(data);
-    return NextResponse.json({ data: product, message: "Produto criado com sucesso." }, { status: 201 });
+    return NextResponse.json(
+      { data: product, message: "Produto criado com sucesso." },
+      { status: 201 },
+    );
   } catch (error) {
     return errorResponse(error); // Zod vira 422, AppError vira o status dela, o resto vira 500
   }
@@ -272,6 +303,7 @@ Regras, `env.ts` validado com Zod e o que pode ter prefixo `NEXT_PUBLIC_`: `rule
 
 - Imagens com `Image` de `next/image`: informar `width` e `height`, ou `fill` com container posicionado, e `alt` descritivo. Domínio externo precisa estar liberado no `next.config`.
 - Fontes com `next/font`, carregadas no `layout.tsx` raiz e expostas como variável CSS. Nunca `<link>` para CDN de fonte.
+- Fonte de texto sempre gratuita e de licença livre: Google Fonts via `next/font/google`, ou arquivo local sob OFL ou Apache via `next/font/local`. Nunca fonte paga, trial ou de licença restritiva (Adobe Fonts, MyFonts, Monotype e afins), mesmo que a referência de design use uma. Nesse caso, propor a gratuita mais parecida e confirmar com o usuário antes de trocar.
 
 ```tsx
 // src/app/layout.tsx
@@ -279,7 +311,11 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="pt-BR" className={inter.variable}>
       <body>{children}</body>
@@ -290,6 +326,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## Estilos - Tailwind
 
+- Tailwind v4 ou mais novo, sempre a estável mais recente: configuração CSS-first com `@import "tailwindcss"`, tokens em `@theme`, plugin `@tailwindcss/postcss`. Nunca v3, nunca `tailwind.config.js`, nunca `@tailwind base/components/utilities`. Projeto que vier em v3 migra com `npx @tailwindcss/upgrade` antes de qualquer feature.
 - Estas regras não pré-definem nenhuma cor, fonte ou estilo visual. Cada projeto decide a identidade visual na hora, junto com o usuário. Pedir referência (Figma, screenshot, site de referência) antes de escolher a paleta.
 - As cores decididas viram tokens em `styles/globals.css`, dentro de `@theme`, com prefixo `--color-`.
 - Usar no Tailwind sem prefixo: `bg-primary`, `text-foreground`, `border-border`.
@@ -424,7 +461,9 @@ export function ProductsTable({ data }: { data: PaginatedResponse<Product> }) {
       totalPages={data.totalPages}
       pageSizeOptions={[25, 50, 100]}
       onPageChange={(page) => updateParams({ page: String(page) })}
-      onPageSizeChange={(size) => updateParams({ pageSize: String(size), page: "1" })}
+      onPageSizeChange={(size) =>
+        updateParams({ pageSize: String(size), page: "1" })
+      }
     />
   );
 }

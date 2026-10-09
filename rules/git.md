@@ -2,19 +2,19 @@
 
 ## Estratégia de Branches
 
+Padrão (projeto solo): commit direto na `main`, cada commit com permissão explícita do usuário.
+
 ```text
-main            # Produção - sempre estável
-├── develop     # Desenvolvimento - integração contínua
-│   ├── feature/*   # Novas funcionalidades
-│   ├── fix/*       # Correções de bugs
-│   ├── refactor/*  # Refatorações
-│   ├── chore/*     # Tarefas técnicas (deps, configs, CI)
-│   └── release/*   # Preparação de release
+main            # Branch principal de todo repo (git init -b main, nunca master)
+├── feature/*   # Opcional: funcionalidade grande ou trabalho em paralelo
+├── fix/*       # Opcional: correção isolada
+├── refactor/*  # Opcional: refatoração
+└── chore/*     # Opcional: deps, configs, CI
 ```
 
-- `main`: código em produção. Nunca commitar direto.
-- `develop`: branch de integração. Merge via PR.
-- Branches de trabalho sempre criadas a partir de `develop`.
+- `main`: branch principal e de produção. Commit direto nela é o padrão, sempre depois de mostrar mensagem e arquivos e receber o ok do usuário.
+- Branch de trabalho só quando o usuário pedir ou quando a mudança for grande demais para um commit só. Sai da `main` e volta por PR ou merge, com aprovação.
+- `develop` só em projeto com time ou ambiente de homologação, quando o usuário pedir. Nesse caso, branches de trabalho saem da `develop` e `develop` vai para `main` por PR de release.
 
 ## Nomes de Branch
 
@@ -31,8 +31,7 @@ Formato, idioma, tipos, crases, tamanho e exemplos moram em `~/.claude/commands/
 
 - Título em inglês, curto e descritivo (máximo 70 caracteres). Descrição do PR em português.
 - Descrição com: o que foi feito, por que, como testar.
-- PR sempre de branch de trabalho → `develop`.
-- `develop` → `main` apenas para releases.
+- PR de branch de trabalho para `main` (ou para `develop`, quando o projeto tem essa branch).
 - Nunca fazer merge sem build passando.
 
 ## Regras Gerais

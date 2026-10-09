@@ -25,11 +25,12 @@ src/
 │   ├── services/                   # regra de negócio, um arquivo por domínio
 │   ├── validations/                # schemas Zod compartilhados
 │   ├── db.ts                       # instância única do PrismaClient
-│   ├── auth.ts                     # configuração do Auth.js
+│   ├── auth.ts                     # configuração do Better Auth (servidor)
+│   ├── auth-client.ts              # createAuthClient para Client Component
 │   ├── api-error.ts                # helper central de erro
 │   └── env.ts                      # variáveis de ambiente validadas
 ├── generated/prisma/               # Prisma Client gerado
-└── proxy.ts                        # Auth.js na borda (antigo middleware.ts)
+└── proxy.ts                        # redirect otimista por cookie (antigo middleware.ts)
 ```
 
 ### Regras de organização
@@ -65,6 +66,7 @@ export default async function ProductsPage() {
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { createProduct } from "@/lib/services/products";
@@ -80,8 +82,8 @@ export async function createProductAction(
   _state: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const session = await auth();
-  if (!session?.user) return { ok: false, message: "Sessão expirada. Entre novamente." };
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { ok: false, message: "Sessão expirada. Entre novamente." };
 
   const parsed = createProductSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
@@ -170,70 +172,89 @@ export function errorResponse(error: unknown): NextResponse {
 - Erro esperado é `AppError` com código e status. Erro inesperado cai no `500` genérico.
 - Regra de negócio lança `AppError` do service, não retorna `null` ambíguo.
 
-## Autenticação com Auth.js
+## Autenticação com Better Auth
+
+Better Auth faz login por e-mail e senha, cadastro, verificação de e-mail e reset de senha prontos, com sessão guardada no banco via adapter Prisma. O hash de senha (scrypt) é dele: nunca implementar hash, token ou sessão à mão.
 
 ```ts
 // src/lib/auth.ts
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { authenticateUser } from "@/lib/services/users";
+import "server-only";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { prisma } from "@/lib/db";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt", maxAge: 60 * 30 }, // 30 min, renovada a cada request (ver rules/security.md)
-  pages: { signIn: "/login" },
-  providers: [
-    Credentials({
-      credentials: { email: {}, password: {} },
-      authorize: async (credentials) => authenticateUser(credentials),
-    }),
-  ],
-  callbacks: {
-    jwt: ({ token, user }) => (user ? { ...token, id: user.id } : token),
-    session: ({ session, token }) => ({
-      ...session,
-      user: { ...session.user, id: token.id as string },
-    }),
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  emailAndPassword: { enabled: true, minPasswordLength: 8 },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 dias
+    updateAge: 60 * 60 * 24, // renova a expiração uma vez por dia de uso
   },
 });
 ```
 
 ```ts
-// src/app/api/auth/[...nextauth]/route.ts
-import { handlers } from "@/lib/auth";
+// src/app/api/auth/[...all]/route.ts
+import { toNextJsHandler } from "better-auth/next-js";
+import { auth } from "@/lib/auth";
 
-export const { GET, POST } = handlers;
+export const { GET, POST } = toNextJsHandler(auth);
 ```
+
+```ts
+// src/lib/auth-client.ts (único arquivo de auth que Client Component importa)
+import { createAuthClient } from "better-auth/react";
+
+export const authClient = createAuthClient();
+// authClient.signIn.email({ email, password }), authClient.signUp.email(...), authClient.signOut()
+```
+
+- Tabelas `user`, `session`, `account` e `verification` vêm do CLI: `npx auth@latest generate` escreve os modelos no `schema.prisma`; depois `npx prisma migrate dev`. Nunca escrever esses modelos à mão.
+- `BETTER_AUTH_SECRET` (mínimo 32 caracteres) e `BETTER_AUTH_URL` obrigatórias, só em variável de ambiente, validadas no `env.ts`.
+- Sessão fica no banco: `signOut()` e `auth.api.revokeSession` derrubam a sessão de verdade, não só apagam o cookie.
+- `expiresIn` e `updateAge` sempre definidos de propósito; app com dado sensível encurta.
 
 ### Protegendo o servidor
 
 ```ts
-// dentro de um Route Handler
-const session = await auth();
-if (!session?.user) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401);
+// dentro de Route Handler, Server Action ou Server Component
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+
+const session = await auth.api.getSession({ headers: await headers() });
+if (!session) throw new AppError("Não autenticado.", "UNAUTHORIZED", 401);
+// session.user.id é o dono: usar nas queries, nunca aceitar userId do body
 ```
 
 ```ts
 // src/proxy.ts (antigo middleware.ts, renomeado no Next 16)
-export { auth as proxy } from "@/lib/auth";
+import { NextResponse, type NextRequest } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
+
+export function proxy(request: NextRequest) {
+  if (!getSessionCookie(request)) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ["/((?!api/auth|login|_next/static|_next/image|favicon.ico).*)"],
 };
 ```
 
-- O proxy corta o tráfego óbvio, mas não é a proteção: todo Route Handler e toda Server Action verificam a sessão de novo. Projeto vindo do Next 15 migra com `npx @next/codemod@canary middleware-to-proxy .`.
-- Permissão por recurso é checada no service, comparando com o dono do registro. Ter sessão válida não dá acesso ao dado de outro usuário.
-- `AUTH_SECRET` obrigatório e só em variável de ambiente.
-- Senha nunca em log, nunca em resposta, nunca em `console.log`. Hash com `argon2` ou `bcrypt`.
+- O proxy só olha se o cookie existe: é redirect otimista, não autenticação. A documentação do Better Auth diz isso em letras grandes. Todo Route Handler, Server Action e Server Component privado chama `auth.api.getSession` de novo. Projeto vindo do Next 15 migra com `npx @next/codemod@canary middleware-to-proxy .`.
+- Permissão por recurso é checada no service, comparando com `session.user.id`. Ter sessão válida não dá acesso ao dado de outro usuário.
+- Senha nunca em log, nunca em resposta, nunca em `console.log`.
 - Ver `rules/security.md` para o resto (rate limit, headers, CSRF).
 
 ## Tipagem
 
-- Nunca `any`. Entrada desconhecida é `unknown` e passa por Zod.
-- Retorno explícito em toda função exportada de service, action e handler.
-- `catch (error: unknown)`, nunca `catch (error: any)`.
-- Tipo de dado do banco vem do Prisma Client (`Prisma.ProductGetPayload`), não redigitado.
-- Tipo de entrada vem do schema Zod (`z.infer`), não redigitado.
+Regras gerais (sem `any`, sem `as` e `!`, tipo derivado, união de literais) em `rules/codigo.md`. Específico do servidor:
+
+- Corpo de request, `formData`, query e route params entram como `unknown` e só ganham tipo depois do `schema.parse`.
+- `catch (error: unknown)`, nunca `catch (error: any)`; o `errorResponse` faz o `instanceof`.
+- Retorno explícito em service, Server Action e Route Handler: é o contrato que o componente e o teste enxergam.
 
 ## Variáveis de Ambiente
 
@@ -244,7 +265,8 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.url("DATABASE_URL inválida."),
-  AUTH_SECRET: z.string().min(32, "AUTH_SECRET muito curta."),
+  BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET muito curta."),
+  BETTER_AUTH_URL: z.url("BETTER_AUTH_URL inválida."),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 

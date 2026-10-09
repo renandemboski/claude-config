@@ -77,16 +77,31 @@ Vale para respostas, commits, PRs e documentação:
 - Sem anunciar o que vem: "vamos lá", "veja o que você precisa saber". Começar pelo fato.
 - Sem fecho de chatbot: "espero que ajude", "qualquer coisa me avisa", "o futuro é promissor". Terminar no último fato concreto.
 
-## Início de Projeto - Perguntas Obrigatórias
+## Início de toda sessão - organizar o chat
 
-**OBRIGATÓRIO:** Ao iniciar qualquer projeto novo, ANTES de criar qualquer arquivo ou estrutura, perguntar ao usuário:
+Na primeira resposta de cada sessão no app desktop, antes de qualquer trabalho, sem narrar:
 
-1. **Identidade visual**: já existe referência (Figma, screenshot, site) ou definimos cores e tipografia do zero agora?
-2. **Escopo**: o projeto precisa de banco e autenticação, ou é só uma landing page (interface sem dados) por enquanto?
+1. Renomear a sessão com `mcp__ccd_session_mgmt__set_session_title` no formato `<Projeto>: <tarefa>`. `<Projeto>` é o nome do grupo da barra lateral, em uma palavra (`Diogo`, `Letícia`, `AuditPro`; `Claude Config` vira `Config`), nunca o nome completo do repositório. `<tarefa>` tem no máximo 3 palavras, em minúsculo, e descreve uma coisa só: `Diogo: revisão do banco`, `Letícia: login`. Tarefa com dois assuntos usa o principal, nunca "X e Y". Sem emoji, sem data.
+2. Listar os grupos da barra lateral com `mcp__ccd_sidebar__list_groups` e mover a sessão para o grupo certo com `mcp__ccd_sidebar__move_sessions`. Os grupos têm nome de projeto ou de cliente (`Claude Config`, `Letícia`, `Hélen`, `AuditPro`): usar o que já existe, nunca criar parecido. Sem grupo para o projeto, criar com `mcp__ccd_sidebar__create_group` usando o nome curto do cliente ou projeto (uma palavra quando der), em Title Case como os outros.
+3. Sessão sem projeto claro (pergunta solta, teste) vai para `Pessoal`. Mexer nas regras ou no repo de config vai para `Claude Config`.
+
+Se a tarefa mudar de assunto no meio da sessão, renomear de novo. Só comentar no chat se criou grupo novo, em uma linha.
+
+## Início de Projeto - Questionário Obrigatório
+
+**OBRIGATÓRIO:** ao iniciar qualquer projeto novo, ANTES de criar qualquer arquivo ou estrutura:
+
+1. **Ambiente**: conferir o Context7 com `claude mcp get context7`. Se faltar, instalar com o comando de `rules/codigo.md` antes de seguir.
+
+2. **Tamanho**: perguntar ao usuário (AskUserQuestion) se é uma landing page simples ou um projeto maior.
+   - Landing page: só interface, sem dados. Next.js, Tailwind e React Hook Form com Zod para formulário. Sem Prisma, sem Better Auth, sem Docker.
+   - Projeto maior: área logada, banco, pagamento ou integração. Stack completa da tabela abaixo, e confirmar o que entra na primeira entrega.
+
+3. **Identidade visual**: já existe referência (Figma, screenshot, site) ou definimos cores e tipografia do zero agora?
 
 Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica (cor decidida vira token, componente usa token), nunca a escolha estética.
 
-- Antes da primeira feature de qualquer projeto novo: formatador, lint, `.editorconfig` e pre-commit configurados conforme `rules/codigo.md`.
+- Antes da primeira feature de qualquer projeto novo: formatador, lint, `.editorconfig`, `.npmrc` e pre-commit configurados conforme `rules/codigo.md`.
 
 ## Stack Padrão
 
@@ -95,8 +110,8 @@ Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica 
 | **Framework** | Next.js (App Router) |
 | **Linguagem** | TypeScript |
 | **Banco de dados** | PostgreSQL com Prisma ORM |
-| **Autenticação** | Auth.js (NextAuth) |
-| **Estilos** | Tailwind CSS |
+| **Autenticação** | Better Auth (e-mail e senha, sessão no banco, adapter Prisma) |
+| **Estilos** | Tailwind CSS, v4 ou mais novo (CSS-first; nunca v3 nem `tailwind.config.js`) |
 | **Formulários** | React Hook Form, Zod |
 | **Cache de dados no cliente** | TanStack Query (quando necessário) |
 | **Tabelas** | TanStack Table |
@@ -105,14 +120,24 @@ Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica 
 | **Testes** | Vitest, Testing Library |
 | **Pacotes** | npm |
 
-Tudo na versão estável mais recente, conferida na fonte oficial antes de instalar, nunca de memória. Vale para cada linha da tabela e para qualquer dependência que entrar depois (ver `rules/codigo.md`).
+Tudo na versão estável mais recente, conferida com `npm view <pacote> version` antes de instalar, nunca de memória. Vale para cada linha da tabela e para qualquer dependência que entrar depois (procedimento completo em `rules/codigo.md`).
 
 ## Estrutura de Projeto
 
-Um repositório por projeto, fullstack no Next.js. Estrutura de pastas em `rules/frontend.md` (app, components, features, lib) e `rules/backend.md` (Route Handlers, services, Prisma, Auth.js).
+Um repositório por projeto, fullstack no Next.js. Estrutura de pastas em `rules/frontend.md` (app, components, features, lib) e `rules/backend.md` (Route Handlers, services, Prisma, Better Auth).
 
 - Nunca commitar `.env`, apenas `.env.example`.
 - `README.md` com stack, setup e como rodar. Variáveis de ambiente ficam só no `.env.example`, o README só aponta para ele.
+
+## Time de Agentes - acionamento automático
+
+Não esperar o usuário digitar `/dev-team`. Decidir pelo tamanho da demanda:
+
+- **Feature ou mudança em mais de um arquivo/camada** → rodar automaticamente o fluxo completo do `/dev-team` (`~/.claude/commands/dev-team.md`).
+- **Tarefa pequena e bem delimitada** (um arquivo, um ajuste) → delegar direto ao agente da área (`backend-dev`, `frontend-dev`...), sem o fluxo completo.
+- **Pergunta, análise ou correção trivial** → responder direto, sem agente.
+
+Em dúvida entre os dois primeiros, perguntar ao usuário. As aprovações do fluxo continuam valendo (plano e commit sempre passam pelo usuário).
 
 ## Regras que NUNCA devem ser ignoradas
 
