@@ -5,7 +5,7 @@
 Antes de finalizar QUALQUER texto, releia e aplique estas substituições:
 
 1. **Travessão / em-dash (`—`) é PROIBIDO.** Sempre que sentir vontade de usar `—`, use uma destas opções:
-   - Hífen com espaços ao redor: ` - `
+   - Hífen com espaços ao redor: `-`
    - Vírgula
    - Dois-pontos
    - Reescreva a frase quebrando em duas
@@ -13,6 +13,7 @@ Antes de finalizar QUALQUER texto, releia e aplique estas substituições:
 2. **Emojis são PROIBIDOS** em qualquer texto, código ou arquivo, salvo pedido explícito do usuário na mensagem atual.
 
 Essa regra vale para:
+
 - Respostas no chat (incluindo respostas curtas)
 - Mensagens de commit e títulos/descrições de PR
 - Comentários em código
@@ -38,6 +39,7 @@ Direto ao ponto, linguagem de estagiário novo, SEM textão. Regras duras:
   ```
 
   Proibido no relatório final: narrar o passo a passo, explicar código trecho a trecho, justificar decisão que ninguém questionou, listar o que não mudou, colar blocos de código.
+
 - Detalhe, justificativa e teoria só se o usuário pedir ("explica", "por quê", "a fundo").
 - Frases curtas. Sem jargão; termo técnico inevitável ganha meia frase de explicação.
 - Texto longo (mais de 5 linhas) é dividido: parágrafos de até 3 linhas, uma linha em branco entre eles, um assunto por parágrafo. Bloco compacto de texto é proibido; o leitor precisa respirar entre as ideias.
@@ -81,8 +83,9 @@ Vale para respostas, commits, PRs e documentação:
 
 Na primeira resposta de cada sessão no app desktop, antes de qualquer trabalho, sem narrar:
 
-1. Renomear a sessão com `mcp__ccd_session_mgmt__set_session_title` no formato `<Projeto>: <tarefa>`. `<Projeto>` é o nome do grupo da barra lateral, em uma palavra (`Diogo`, `Letícia`, `AuditPro`; `Claude Config` vira `Config`), nunca o nome completo do repositório. `<tarefa>` tem no máximo 3 palavras, em minúsculo, e descreve uma coisa só: `Diogo: revisão do banco`, `Letícia: login`. Tarefa com dois assuntos usa o principal, nunca "X e Y". Sem emoji, sem data.
-2. Listar os grupos da barra lateral com `mcp__ccd_sidebar__list_groups` e mover a sessão para o grupo certo com `mcp__ccd_sidebar__move_sessions`. Os grupos têm nome de projeto ou de cliente (`Claude Config`, `Letícia`, `Hélen`, `AuditPro`): usar o que já existe, nunca criar parecido. Sem grupo para o projeto, criar com `mcp__ccd_sidebar__create_group` usando o nome curto do cliente ou projeto (uma palavra quando der), em Title Case como os outros.
+1. Renomear a sessão com `mcp__ccd_session_mgmt__set_session_title`. Sessão principal (aberta pelo usuário) usa o formato `- <Projeto>: <tarefa>`, com hífen e espaço no começo. `<Projeto>` é o nome do grupo da barra lateral sem o sufixo ` ----------`, em uma palavra (`Diogo`, `Letícia`, `AuditPro`; `Claude Config` vira `Config`), nunca o nome completo do repositório. `<tarefa>` tem no máximo 3 palavras, em minúsculo, e descreve uma coisa só: `- Diogo: revisão do banco`, `- Letícia: login`. Tarefa com dois assuntos usa o principal, nunca "X e Y". Sem emoji, sem data.
+   Subsessão (iniciada por outra sessão com `start_session`) leva só a `<tarefa>`, sem hífen e sem projeto: `revisão do banco`, `login`. Vale para o título passado ao criar a subsessão e para quem renomeia depois.
+2. Listar os grupos da barra lateral com `mcp__ccd_sidebar__list_groups` e mover a sessão para o grupo certo com `mcp__ccd_sidebar__move_sessions`. Os grupos têm nome de projeto ou de cliente seguido de ` ----------` (`Claude Config ----------`, `Letícia ----------`, `AuditPro ----------`): usar o que já existe, nunca criar parecido. Sem grupo para o projeto, criar com `mcp__ccd_sidebar__create_group` usando o nome curto do cliente ou projeto (uma palavra quando der), em Title Case como os outros, mais o sufixo ` ----------`.
 3. Sessão sem projeto claro (pergunta solta, teste) vai para `Pessoal`. Mexer nas regras ou no repo de config vai para `Claude Config`.
 
 Se a tarefa mudar de assunto no meio da sessão, renomear de novo. Só comentar no chat se criou grupo novo, em uma linha.
@@ -105,20 +108,20 @@ Nenhuma paleta, fonte ou estilo vem pré-definido. As regras cobrem a mecânica 
 
 ## Stack Padrão
 
-| Camada | Tecnologias |
-|--------|-------------|
-| **Framework** | Next.js (App Router) |
-| **Linguagem** | TypeScript |
-| **Banco de dados** | PostgreSQL com Prisma ORM |
-| **Autenticação** | Better Auth (e-mail e senha, sessão no banco, adapter Prisma) |
-| **Estilos** | Tailwind CSS, v4 ou mais novo (CSS-first; nunca v3 nem `tailwind.config.js`) |
-| **Formulários** | React Hook Form, Zod |
-| **Cache de dados no cliente** | TanStack Query (quando necessário) |
-| **Tabelas** | TanStack Table |
-| **Gráficos** | Recharts |
-| **Datas** | date-fns |
-| **Testes** | Vitest, Testing Library |
-| **Pacotes** | npm |
+| Camada                        | Tecnologias                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| **Framework**                 | Next.js (App Router)                                                         |
+| **Linguagem**                 | TypeScript                                                                   |
+| **Banco de dados**            | PostgreSQL com Prisma ORM                                                    |
+| **Autenticação**              | Better Auth (e-mail e senha, sessão no banco, adapter Prisma)                |
+| **Estilos**                   | Tailwind CSS, v4 ou mais novo (CSS-first; nunca v3 nem `tailwind.config.js`) |
+| **Formulários**               | React Hook Form, Zod                                                         |
+| **Cache de dados no cliente** | TanStack Query (quando necessário)                                           |
+| **Tabelas**                   | TanStack Table                                                               |
+| **Gráficos**                  | Recharts                                                                     |
+| **Datas**                     | date-fns                                                                     |
+| **Testes**                    | Vitest, Testing Library                                                      |
+| **Pacotes**                   | npm                                                                          |
 
 Tudo na versão estável mais recente, conferida com `npm view <pacote> version` antes de instalar, nunca de memória. Vale para cada linha da tabela e para qualquer dependência que entrar depois (procedimento completo em `rules/codigo.md`).
 
@@ -128,16 +131,6 @@ Um repositório por projeto, fullstack no Next.js. Estrutura de pastas em `rules
 
 - Nunca commitar `.env`, apenas `.env.example`.
 - `README.md` com stack, setup e como rodar. Variáveis de ambiente ficam só no `.env.example`, o README só aponta para ele.
-
-## Time de Agentes - acionamento automático
-
-Não esperar o usuário digitar `/dev-team`. Decidir pelo tamanho da demanda:
-
-- **Feature ou mudança em mais de um arquivo/camada** → rodar automaticamente o fluxo completo do `/dev-team` (`~/.claude/commands/dev-team.md`).
-- **Tarefa pequena e bem delimitada** (um arquivo, um ajuste) → delegar direto ao agente da área (`backend-dev`, `frontend-dev`...), sem o fluxo completo.
-- **Pergunta, análise ou correção trivial** → responder direto, sem agente.
-
-Em dúvida entre os dois primeiros, perguntar ao usuário. As aprovações do fluxo continuam valendo (plano e commit sempre passam pelo usuário).
 
 ## Regras que NUNCA devem ser ignoradas
 
@@ -153,18 +146,18 @@ Em dúvida entre os dois primeiros, perguntar ao usuário. As aprovações do fl
 
 **OBRIGATÓRIO:** Antes de escrever qualquer código, leia o arquivo de regras correspondente usando a ferramenta Read:
 
-| Área | Arquivo | Quando ler |
-|------|---------|------------|
-| Código (universal) | `~/.claude/rules/codigo.md` | SEMPRE que codar, qualquer camada |
-| Frontend | `~/.claude/rules/frontend.md` | Componentes, hooks, forms, UI, acessibilidade, estilos |
-| Servidor | `~/.claude/rules/backend.md` | Route Handlers, Server Actions, services, autenticação |
-| API | `~/.claude/rules/api.md` | Contratos REST, status codes, responses, consumo no cliente |
-| Banco de dados | `~/.claude/rules/database.md` | Schema Prisma, migrations, queries, constraints |
-| Testes | `~/.claude/rules/tests.md` | O que testar, o que não testar, Vitest |
-| Segurança | `~/.claude/rules/security.md` | OWASP Top 10, XSS, CSRF, secrets, headers |
-| Git | `~/.claude/rules/git.md` | Branches, commits, PRs, workflow |
-| Docker | `~/.claude/rules/docker.md` | docker-compose, Dockerfile, imagens, volumes |
-| Deploy | `~/.claude/rules/deploy.md` | Só quando o assunto for subir para produção ou o app estiver crescendo. Projeto pequeno ou local não precisa |
+| Área               | Arquivo                       | Quando ler                                                                                                   |
+| ------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Código (universal) | `~/.claude/rules/codigo.md`   | SEMPRE que codar, qualquer camada                                                                            |
+| Frontend           | `~/.claude/rules/frontend.md` | Componentes, hooks, forms, UI, acessibilidade, estilos                                                       |
+| Servidor           | `~/.claude/rules/backend.md`  | Route Handlers, Server Actions, services, autenticação                                                       |
+| API                | `~/.claude/rules/api.md`      | Contratos REST, status codes, responses, consumo no cliente                                                  |
+| Banco de dados     | `~/.claude/rules/database.md` | Schema Prisma, migrations, queries, constraints                                                              |
+| Testes             | `~/.claude/rules/tests.md`    | O que testar, o que não testar, Vitest                                                                       |
+| Segurança          | `~/.claude/rules/security.md` | OWASP Top 10, XSS, CSRF, secrets, headers                                                                    |
+| Git                | `~/.claude/rules/git.md`      | Branches, commits, PRs, workflow                                                                             |
+| Docker             | `~/.claude/rules/docker.md`   | docker-compose, Dockerfile, imagens, volumes                                                                 |
+| Deploy             | `~/.claude/rules/deploy.md`   | Só quando o assunto for subir para produção ou o app estiver crescendo. Projeto pequeno ou local não precisa |
 
 **NUNCA pule essa etapa. Leia o arquivo ANTES de começar a implementação.**
 

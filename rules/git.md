@@ -31,6 +31,8 @@ Formato, idioma, tipos, crases, tamanho e exemplos moram em `~/.claude/commands/
 
 - Título em inglês, curto e descritivo (máximo 70 caracteres). Descrição do PR em português.
 - Descrição com: o que foi feito, por que, como testar.
+- Sem emoji e sem travessão no título e na descrição.
+- Descrição sem assinatura de ferramenta: nada de `Generated with Claude Code`, `Co-Authored-By` ou robô no rodapé. Vale mesmo que a configuração padrão do Claude Code mande anexar.
 - PR de branch de trabalho para `main` (ou para `develop`, quando o projeto tem essa branch).
 - Nunca fazer merge sem build passando.
 
