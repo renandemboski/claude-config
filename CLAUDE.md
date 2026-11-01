@@ -132,16 +132,6 @@ Um repositório por projeto, fullstack no Next.js. Estrutura de pastas em `rules
 - Nunca commitar `.env`, apenas `.env.example`.
 - `README.md` com stack, setup e como rodar. Variáveis de ambiente ficam só no `.env.example`, o README só aponta para ele.
 
-## Time de Agentes - acionamento automático
-
-Não esperar o usuário digitar `/dev-team`. Decidir pelo tamanho da demanda:
-
-- **Feature ou mudança em mais de um arquivo/camada** → rodar automaticamente o fluxo completo do `/dev-team` (`~/.claude/commands/dev-team.md`).
-- **Tarefa pequena e bem delimitada** (um arquivo, um ajuste) → delegar direto ao agente da área (`backend-dev`, `frontend-dev`...), sem o fluxo completo.
-- **Pergunta, análise ou correção trivial** → responder direto, sem agente.
-
-Em dúvida entre os dois primeiros, perguntar ao usuário. As aprovações do fluxo continuam valendo (plano e commit sempre passam pelo usuário).
-
 ## Regras que NUNCA devem ser ignoradas
 
 - **Padrões de código** (proibição de `any`, hardcode, dependências, comentários, limpeza, estados de UI, Context7, nomenclatura): fonte única em `rules/codigo.md`. **Ler antes de codar, sempre**, em qualquer projeto e por qualquer agente.
