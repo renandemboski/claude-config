@@ -83,8 +83,8 @@ Vale para respostas, commits, PRs e documentação:
 
 Na primeira resposta de cada sessão no app desktop, antes de qualquer trabalho, sem narrar:
 
-1. Renomear a sessão com `mcp__ccd_session_mgmt__set_session_title`. Sessão principal (aberta pelo usuário) usa o formato `- <Projeto>: <tarefa>`, com hífen e espaço no começo. `<Projeto>` é o nome do grupo da barra lateral sem o sufixo ` ----------`, em uma palavra (`Diogo`, `Letícia`, `AuditPro`; `Claude Config` vira `Config`), nunca o nome completo do repositório. `<tarefa>` tem no máximo 3 palavras, em minúsculo, e descreve uma coisa só: `- Diogo: revisão do banco`, `- Letícia: login`. Tarefa com dois assuntos usa o principal, nunca "X e Y". Sem emoji, sem data.
-   Subsessão (iniciada por outra sessão com `start_session`) leva só a `<tarefa>`, sem hífen e sem projeto: `revisão do banco`, `login`. Vale para o título passado ao criar a subsessão e para quem renomeia depois.
+1. Renomear a sessão com `mcp__ccd_session_mgmt__set_session_title`. Sessão principal (aberta pelo usuário) usa o formato `└ <Projeto>: <tarefa>`, com `└` e espaço no começo. `<Projeto>` é o nome do grupo da barra lateral sem o sufixo ` ----------`, em uma palavra (`Diogo`, `Letícia`, `AuditPro`; `Claude Config` vira `Config`), nunca o nome completo do repositório. `<tarefa>` tem no máximo 3 palavras, em minúsculo, e descreve uma coisa só: `└ Diogo: revisão do banco`, `└ Letícia: login`. Tarefa com dois assuntos usa o principal, nunca "X e Y". Sem emoji, sem data.
+   Subsessão (iniciada por outra sessão com `start_session`) leva só a `<tarefa>`, sem `└` e sem projeto: `revisão do banco`, `login`. Vale para o título passado ao criar a subsessão e para quem renomeia depois.
 2. Listar os grupos da barra lateral com `mcp__ccd_sidebar__list_groups` e mover a sessão para o grupo certo com `mcp__ccd_sidebar__move_sessions`. Os grupos têm nome de projeto ou de cliente seguido de ` ----------` (`Claude Config ----------`, `Letícia ----------`, `AuditPro ----------`): usar o que já existe, nunca criar parecido. Sem grupo para o projeto, criar com `mcp__ccd_sidebar__create_group` usando o nome curto do cliente ou projeto (uma palavra quando der), em Title Case como os outros, mais o sufixo ` ----------`.
 3. Sessão sem projeto claro (pergunta solta, teste) vai para `Pessoal`. Mexer nas regras ou no repo de config vai para `Claude Config`.
 
@@ -131,6 +131,16 @@ Um repositório por projeto, fullstack no Next.js. Estrutura de pastas em `rules
 
 - Nunca commitar `.env`, apenas `.env.example`.
 - `README.md` com stack, setup e como rodar. Variáveis de ambiente ficam só no `.env.example`, o README só aponta para ele.
+
+## Time de Agentes - acionamento automático
+
+Não esperar o usuário digitar `/dev-team`. Decidir pelo tamanho da demanda:
+
+- **Feature ou mudança em mais de um arquivo/camada** → rodar automaticamente o fluxo completo do `/dev-team` (`~/.claude/commands/dev-team.md`).
+- **Tarefa pequena e bem delimitada** (um arquivo, um ajuste) → delegar direto ao agente da área (`backend-dev`, `frontend-dev`...), sem o fluxo completo.
+- **Pergunta, análise ou correção trivial** → responder direto, sem agente.
+
+Em dúvida entre os dois primeiros, perguntar ao usuário. As aprovações do fluxo continuam valendo (plano e commit sempre passam pelo usuário).
 
 ## Regras que NUNCA devem ser ignoradas
 

@@ -80,6 +80,6 @@
     "**/.claude/rules/**"
   ],
   "theme": "dark-daltonized",
-  "voiceEnabled": true,
-  "switchModelsOnFlag": false
+  "switchModelsOnFlag": false,
+  "voiceEnabled": true
 }
